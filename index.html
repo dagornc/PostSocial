@@ -4502,7 +4502,12 @@ Génère maintenant le post LinkedIn :`;
                 const posts = await this.getSavedPosts();
                 const post = posts.find(p => p.id === postId);
                 if (post) {
-                    this.copyToClipboard(post.content);
+                    const success = await this.copyToClipboard(post.content);
+                    if (success) {
+                        this.showNotification(this.currentLanguage === 'fr' ? 'Copié !' : 'Copied!', 'success');
+                    } else {
+                        this.showNotification(this.currentLanguage === 'fr' ? 'Erreur de copie.' : 'Copy error.', 'error');
+                    }
                 }
             }
             
@@ -4885,35 +4890,16 @@ Génère maintenant le post LinkedIn :`;
                 });
             }
 
-            async copyPost() {
-                if (!this.elements.postContent) return;
-                const postContent = this.elements.postContent.textContent;
+            async copyToClipboard(text) {
                 try {
-                    await navigator.clipboard.writeText(postContent);
-                    this.showCopySuccess();
+                    await navigator.clipboard.writeText(text);
+                    return true;
                 } catch (err) {
                     console.error('Erreur de copie:', err);
-                    this.fallbackCopy(postContent);
+                    return this.fallbackCopy(text);
                 }
             }
-            
-            showCopySuccess() {
-                if (!this.elements.copyBtn) return;
-                
-                const originalText = this.elements.copyBtn.textContent;
-                const successText = this.currentLanguage === 'fr' ? 'Copié !' : 'Copied!';
-                this.elements.copyBtn.innerHTML = `
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                    </svg>
-                    <span>${successText}</span>
-                `;
-                
-                setTimeout(() => {
-                    this.elements.copyBtn.innerHTML = originalText;
-                }, 2000);
-            }
-            
+
             fallbackCopy(text) {
                 const textArea = document.createElement('textarea');
                 textArea.value = text;
@@ -4927,18 +4913,17 @@ Génère maintenant le post LinkedIn :`;
                 textArea.focus();
                 textArea.select();
                 
+                let success = false;
                 try {
-                    document.execCommand('copy');
-                    this.showCopySuccess();
-                } catch (fallbackErr) {
-                    this.showAlert(this.currentLanguage === 'fr' ? 
-                        'Erreur lors de la copie. Veuillez sélectionner et copier manuellement.' :
-                        'Copy error. Please select and copy manually.');
-                } finally {
-                    document.body.removeChild(textArea);
+                    success = document.execCommand('copy');
+                } catch (err) {
+                    success = false;
                 }
+
+                document.body.removeChild(textArea);
+                return success;
             }
-            
+
             // Modal de profil LinkedIn
             showProfileModal() {
                 const modal = document.createElement('div');
@@ -5215,7 +5200,6 @@ Génère maintenant le post LinkedIn :`;
                 console.log('📤 publishToLinkedIn appelé');
                 
                 if (!this.elements.postContent) {
-                    console.log('❌ Aucun élément postContent trouvé');
                     this.showNotification(this.currentLanguage === 'fr' ? 
                         'Aucun contenu à publier. Générez d\'abord un post.' : 
                         'No content to publish. Generate a post first.',
@@ -5225,10 +5209,8 @@ Génère maintenant le post LinkedIn :`;
                 }
                 
                 const postContent = this.elements.postContent.textContent;
-                console.log('📝 Contenu du post:', postContent?.substring(0, 100) + '...');
                 
                 if (!postContent.trim()) {
-                    console.log('❌ Contenu du post vide');
                     this.showNotification(this.currentLanguage === 'fr' ? 
                         'Le contenu du post est vide.' : 
                         'Post content is empty.',
@@ -5237,9 +5219,7 @@ Génère maintenant le post LinkedIn :`;
                     return;
                 }
                 
-                // Vérifier si le profil LinkedIn est configuré
                 if (!this.hasValidLinkedInProfile()) {
-                    console.log('⚠️ Profil LinkedIn non configuré');
                     this.showNotification(this.currentLanguage === 'fr' ? 
                         'Veuillez d\'abord configurer votre profil LinkedIn dans les paramètres.' : 
                         'Please configure your LinkedIn profile in settings first.',
@@ -5248,42 +5228,19 @@ Génère maintenant le post LinkedIn :`;
                     this.showProfileModal();
                     return;
                 }
-                
-                try {
-                    const profile = this.getLinkedInProfile();
-                    if (!profile) {
-                        throw new Error('Profil LinkedIn invalide');
-                    }
-                    
-                    console.log('🚀 Début de la publication sur LinkedIn...');
-                    
-                    // Simulation de publication (en production, intégrer avec l'API LinkedIn)
-                    this.setPublishingState(true);
-                    
-                    // Simuler un délai de publication
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                    
-                    // Succès simulé
-                    console.log('✅ Publication simulée réussie');
-                    this.showNotification(this.currentLanguage === 'fr' ? 
-                        'Post publié avec succès sur LinkedIn !' : 
-                        'Post published successfully on LinkedIn!',
+
+                const success = await this.copyToClipboard(postContent);
+
+                if (success) {
+                    window.open('https://www.linkedin.com/feed/', '_blank');
+                    this.showNotification(
+                        this.currentLanguage === 'fr' ?
+                        'Contenu copié ! Collez-le sur LinkedIn.' :
+                        'Content copied! Paste it on LinkedIn.',
                         'success'
                     );
-                    
-                    // Sauvegarder le post comme publié
-                    this.savePublishedPost(postContent, profile);
-                    
-                } catch (error) {
-                    console.error('❌ Erreur publication LinkedIn:', error);
-                    this.showNotification(this.currentLanguage === 'fr' ? 
-                        'Erreur lors de la publication sur LinkedIn.' : 
-                        'Error publishing to LinkedIn.',
-                        'error'
-                    );
-                } finally {
-                    this.setPublishingState(false);
-                    console.log('🔄 État de publication réinitialisé');
+                } else {
+                    this.showNotification(this.currentLanguage === 'fr' ? 'Erreur de copie.' : 'Copy error.', 'error');
                 }
             }
             
