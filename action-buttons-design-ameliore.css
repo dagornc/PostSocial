@@ -134,7 +134,6 @@
 
 /* Suppression des anciens styles et textes d'aide */
 .copy-btn,
-.publish-btn,
 .action-btn.save,
 .button-description,
 .field-help[role="tooltip"] {

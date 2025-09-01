@@ -102,7 +102,6 @@
 
 /* Suppression des anciens styles */
 .copy-btn,
-.publish-btn,
 .action-btn.save {
     display: none !important;
 }
