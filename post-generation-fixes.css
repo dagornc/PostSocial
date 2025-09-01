@@ -1,0 +1,387 @@
+/* 🚀 Améliorations pour le Bouton de Génération de Posts */
+
+/* Styles du bouton de génération */
+.generate-btn {
+    position: relative;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+    padding: 15px 30px;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 56px;
+    width: 100%;
+    max-width: 400px;
+    margin: 20px auto;
+}
+
+.generate-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}
+
+.generate-btn:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(102, 126, 234, 0.4);
+}
+
+.generate-btn:disabled {
+    background: #bdc3c7;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    opacity: 0.7;
+}
+
+/* État de chargement */
+.generate-btn.loading-state {
+    background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+    cursor: wait;
+}
+
+/* Spinner de chargement */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #ffffff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Icône dans le bouton */
+.generate-btn .icon {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+    transition: transform 0.3s ease;
+}
+
+.generate-btn:hover:not(:disabled) .icon {
+    transform: scale(1.1);
+}
+
+/* Texte du bouton */
+.generate-btn span {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .generate-btn {
+        padding: 12px 24px;
+        font-size: 14px;
+        min-height: 48px;
+    }
+    
+    .generate-btn .icon {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+/* Améliorations des champs de formulaire */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+.form-group label .required {
+    color: #e74c3c;
+    font-weight: bold;
+    margin-left: 4px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e1e8ed;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: #ffffff;
+    color: #2c3e50;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+/* Textes d'aide */
+.field-help {
+    font-size: 13px;
+    color: #7f8c8d;
+    margin-top: 6px;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 3px solid #667eea;
+    line-height: 1.4;
+}
+
+/* Validation des champs */
+.form-group input:invalid,
+.form-group select:invalid,
+.form-group textarea:invalid {
+    border-color: #e74c3c;
+}
+
+.form-group input:valid,
+.form-group select:valid,
+.form-group textarea:valid {
+    border-color: #27ae60;
+}
+
+/* Messages d'erreur */
+.form-group .error-message {
+    color: #e74c3c;
+    font-size: 12px;
+    margin-top: 4px;
+    display: none;
+}
+
+.form-group input:invalid + .error-message,
+.form-group select:invalid + .error-message,
+.form-group textarea:invalid + .error-message {
+    display: block;
+}
+
+/* Boutons d'action */
+.action-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.action-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+}
+
+.action-btn:not(.disabled):hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.action-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Bouton de copie */
+.copy-btn {
+    background: #3498db;
+    color: white;
+}
+
+.copy-btn:hover:not(.disabled) {
+    background: #2980b9;
+}
+
+/* Bouton de publication */
+.publish-btn {
+    background: #27ae60;
+    color: white;
+}
+
+.publish-btn:hover:not(.disabled) {
+    background: #229954;
+}
+
+/* Bouton de sauvegarde */
+.action-btn.save {
+    background: #f39c12;
+    color: white;
+}
+
+.action-btn.save:hover:not(.disabled) {
+    background: #e67e22;
+}
+
+/* Résultat du post */
+.post-result {
+    margin-top: 30px;
+    padding: 25px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.post-result h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #2c3e50;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.post-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    min-height: 120px;
+    line-height: 1.6;
+    font-size: 15px;
+    color: #2c3e50;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.post-content p {
+    margin: 0 0 16px 0;
+}
+
+.post-content p:last-child {
+    margin-bottom: 0;
+}
+
+.post-content .hashtag {
+    color: #667eea;
+    font-weight: 600;
+    background: rgba(102, 126, 234, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-right: 4px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.post-result {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* États de focus pour l'accessibilité */
+.generate-btn:focus,
+.action-btn:focus,
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* Mode sombre (optionnel) */
+@media (prefers-color-scheme: dark) {
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        background: #2c3e50;
+        color: #ecf0f1;
+        border-color: #34495e;
+    }
+    
+    .field-help {
+        background: #34495e;
+        color: #bdc3c7;
+    }
+    
+    .post-content {
+        background: #2c3e50;
+        color: #ecf0f1;
+        border-color: #34495e;
+    }
+}
+
+/* Indicateurs de statut */
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.status-indicator.checking {
+    background: rgba(52, 152, 219, 0.1);
+    color: #2980b9;
+}
+
+.status-indicator.success {
+    background: rgba(39, 174, 96, 0.1);
+    color: #27ae60;
+}
+
+.status-indicator.error {
+    background: rgba(231, 76, 60, 0.1);
+    color: #c0392b;
+}
+
+/* Responsive pour les petits écrans */
+@media (max-width: 480px) {
+    .action-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .action-btn {
+        justify-content: center;
+    }
+    
+    .post-result {
+        padding: 20px;
+    }
+    
+    .post-content {
+        padding: 15px;
+    }
+}

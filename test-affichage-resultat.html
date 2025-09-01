@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Affichage du Résultat - LinkedINPost</title>
+    
+    <!-- Styles de base -->
+    <link rel="stylesheet" href="design-fixes.css">
+    <link rel="stylesheet" href="accessibility-fixes.css">
+    <link rel="stylesheet" href="ui-ux-improvements.css">
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+        
+        .test-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            background: #f8f9fa;
+        }
+        
+        .test-section h2 {
+            color: #0077b5;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .required {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .field-help {
+            font-size: 13px;
+            color: #495057;
+            margin-top: 6px;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 3px solid #0077b5;
+        }
+        
+        .generate-btn {
+            background: linear-gradient(135deg, #0077b5 0%, #00a0dc 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-height: 56px;
+            width: 100%;
+            max-width: 400px;
+            margin: 20px auto;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 119, 181, 0.4);
+        }
+        
+        .generate-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 119, 181, 0.6);
+        }
+        
+        .generate-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            opacity: 0.7;
+        }
+        
+        .generate-btn.loading-state {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+            cursor: wait;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #ffffff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Styles pour le résultat */
+        .post-result {
+            background: white;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            display: none; /* Caché par défaut */
+        }
+        
+        .post-result.visible {
+            display: block;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .post-result h3 {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #0077b5;
+            padding-bottom: 10px;
+        }
+        
+        .post-content {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            min-height: 100px;
+            line-height: 1.6;
+            font-size: 1.1rem;
+            color: #2c3e50;
+            white-space: pre-wrap;
+        }
+        
+        .post-content:empty::before {
+            content: "Le contenu généré apparaîtra ici...";
+            color: #6c757d;
+            font-style: italic;
+        }
+        
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .action-btn.copy {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .action-btn.copy:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        .action-btn.publish {
+            background: #0077b5;
+            color: white;
+        }
+        
+        .action-btn.publish:hover {
+            background: #005885;
+            transform: translateY(-2px);
+        }
+        
+        .action-btn.save {
+            background: #ff6b35;
+            color: white;
+        }
+        
+        .action-btn.save:hover {
+            background: #e55a2b;
+            transform: translateY(-2px);
+        }
+        
+        .icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+        
+        .test-results {
+            background: #e8f5e8;
+            border: 1px solid #27ae60;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .test-results h3 {
+            color: #27ae60;
+            margin-top: 0;
+        }
+        
+        .test-item {
+            margin: 10px 0;
+            padding: 8px;
+            border-radius: 4px;
+            background: white;
+        }
+        
+        .test-item.success {
+            background: #d4edda;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .test-item.error {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .test-item.warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .accessibility-info {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .accessibility-info h3 {
+            color: #2196f3;
+            margin-top: 0;
+        }
+        
+        .debug-info {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .hashtag {
+            background: linear-gradient(135deg, #0077b5, #00a0dc);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            margin: 0 2px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Test - Affichage du Résultat</h1>
+        
+        <div class="accessibility-info">
+            <h3>📋 Objectif du Test</h3>
+            <p>Ce test vérifie que le résultat du prompt de génération s'affiche correctement dans l'interface.</p>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔧 Formulaire de Test</h2>
+            
+            <form id="testForm" novalidate>
+                <div class="form-group">
+                    <label for="testSubject" id="testSubjectLabel">
+                        Sujet du post <span class="required" aria-label="Champ obligatoire">*</span>
+                    </label>
+                    <textarea id="testSubject" name="subject" required 
+                             rows="3" 
+                             placeholder="Décrivez le sujet de votre post LinkedIn en quelques lignes..."
+                             aria-describedby="testSubject-help"
+                             aria-required="true"
+                             aria-invalid="false"
+                             aria-label="Zone de texte pour décrire le sujet de votre post LinkedIn"
+                             tabindex="0"
+                             autocomplete="off"
+                             spellcheck="true">Test d'affichage du résultat : vérification que le contenu généré s'affiche correctement dans l'interface utilisateur</textarea>
+                    <div id="testSubject-help" class="field-help" role="tooltip" aria-hidden="false">
+                        Par exemple : votre expertise, une réflexion professionnelle, une actualité de votre secteur, etc.
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="testAudience" id="testAudienceLabel">
+                        Audience cible <span class="required" aria-label="Champ obligatoire">*</span>
+                    </label>
+                    <select id="testAudience" name="audience" required 
+                            aria-describedby="testAudience-help"
+                            aria-required="true"
+                            aria-invalid="false"
+                            aria-label="Menu déroulant pour sélectionner l'audience cible"
+                            tabindex="0">
+                        <option value="" aria-label="Option par défaut - Choisir une audience">Choisir une audience...</option>
+                        <option value="professionals" aria-label="Professionnels expérimentés" selected>Professionnels expérimentés</option>
+                        <option value="juniors" aria-label="Jeunes professionnels">Jeunes professionnels</option>
+                        <option value="entrepreneurs" aria-label="Entrepreneurs">Entrepreneurs</option>
+                        <option value="managers" aria-label="Managers et dirigeants">Managers et dirigeants</option>
+                        <option value="students" aria-label="Étudiants">Étudiants</option>
+                        <option value="recruiters" aria-label="Recruteurs RH">Recruteurs RH</option>
+                    </select>
+                    <div id="testAudience-help" class="field-help" role="tooltip" aria-hidden="false">
+                        Sélectionnez le type de professionnels que vous souhaitez cibler avec votre post
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="testTone" id="testToneLabel">
+                        Ton du message <span class="required" aria-label="Champ obligatoire">*</span>
+                    </label>
+                    <select id="testTone" name="tone" required 
+                            aria-describedby="testTone-help"
+                            aria-required="true"
+                            aria-invalid="false"
+                            aria-label="Menu déroulant pour sélectionner le ton du message"
+                            tabindex="0">
+                        <option value="" aria-label="Option par défaut - Choisir un ton">Choisir un ton...</option>
+                        <option value="professional" aria-label="Ton professionnel" selected>Professionnel</option>
+                        <option value="inspirational" aria-label="Ton inspirant">Inspirant</option>
+                        <option value="casual" aria-label="Ton décontracté">Décontracté</option>
+                        <option value="educational" aria-label="Ton éducatif">Éducatif</option>
+                        <option value="motivational" aria-label="Ton motivant">Motivant</option>
+                        <option value="thoughtful" aria-label="Ton réfléchi">Réfléchi</option>
+                    </select>
+                    <div id="testTone-help" class="field-help" role="tooltip" aria-hidden="false">
+                        Définissez l'ambiance et le style de votre message LinkedIn
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="testLanguage" id="testLanguageLabel">
+                        Langue du post <span class="required" aria-label="Champ obligatoire">*</span>
+                    </label>
+                    <select id="testLanguage" name="postLanguage" required 
+                            aria-describedby="testLanguage-help"
+                            aria-required="true"
+                            aria-invalid="false"
+                            aria-label="Menu déroulant pour sélectionner la langue du post"
+                            tabindex="0">
+                        <option value="fr" aria-label="Français" selected>Français</option>
+                        <option value="en" aria-label="English">English</option>
+                    </select>
+                    <div id="testLanguage-help" class="field-help" role="tooltip" aria-hidden="false">
+                        Choisissez la langue dans laquelle votre post sera généré
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="testModel" id="testModelLabel">
+                        Modèle IA <span class="required" aria-label="Champ obligatoire">*</span>
+                    </label>
+                    <select id="testModel" name="ollamaModel" required 
+                            aria-describedby="testModel-help"
+                            aria-required="true"
+                            aria-invalid="false"
+                            aria-label="Menu déroulant pour sélectionner le modèle d'intelligence artificielle"
+                            tabindex="0">
+                        <option value="" aria-label="Option par défaut - Choisir un modèle">Choisir un modèle...</option>
+                        <option value="llama2" aria-label="Modèle Llama 2" selected>Llama 2</option>
+                        <option value="mistral" aria-label="Modèle Mistral">Mistral</option>
+                        <option value="codellama" aria-label="Modèle Code Llama">Code Llama</option>
+                    </select>
+                    <div id="testModel-help" class="field-help" role="tooltip" aria-hidden="false">
+                        Sélectionnez le modèle d'intelligence artificielle qui générera votre post
+                    </div>
+                </div>
+
+                <button type="submit" id="generateBtn" class="generate-btn" 
+                        aria-describedby="testGenerate-help"
+                        aria-label="Bouton de test pour générer un post LinkedIn"
+                        tabindex="0">
+                    <svg class="icon" aria-hidden="true">
+                        <use href="#sparkles-icon"></use>
+                    </svg>
+                    <span id="generateBtnText">🧪 Tester l'Affichage</span>
+                </button>
+                
+                <div id="testGenerate-help" class="field-help" role="tooltip" aria-hidden="false">
+                    Bouton de test pour vérifier l'affichage du résultat
+                </div>
+            </form>
+        </div>
+
+        <!-- Section de résultat -->
+        <div class="post-result" id="postResult" role="region" aria-live="polite" aria-labelledby="resultTitle">
+            <h3 id="resultTitle">Votre post LinkedIn :</h3>
+            <div class="post-content" id="postContent" 
+                 role="textbox" 
+                 aria-readonly="true" 
+                 tabindex="0"
+                 aria-describedby="post-content-help"></div>
+            <div id="post-content-help" class="field-help" role="tooltip">
+                Contenu généré par l'IA - vous pouvez le modifier avant de le copier ou publier
+            </div>
+            
+            <div class="action-buttons" role="group" aria-labelledby="action-buttons-label">
+                <div id="action-buttons-label" class="sr-only">Actions disponibles pour le post généré</div>
+                
+                <button class="action-btn copy" id="copyBtn" 
+                        aria-describedby="copy-help"
+                        aria-label="Copier le post dans le presse-papiers">
+                    <svg class="icon" aria-hidden="true">
+                        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                    </svg>
+                    <span>Copier le post</span>
+                </button>
+                <div id="copy-help" class="field-help" role="tooltip">
+                    Copie le contenu généré dans le presse-papiers
+                </div>
+                
+                <button class="action-btn publish" id="publishBtn" 
+                        aria-describedby="publish-help"
+                        aria-label="Publier le post sur LinkedIn">
+                    <svg class="icon" aria-hidden="true">
+                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c0 1.1.9 2 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                    </svg>
+                    <span id="publishBtnText">Publier le Post sur mon LinkedIn</span>
+                </button>
+                <div id="publish-help" class="field-help" role="tooltip">
+                    Publie le post directement sur votre profil LinkedIn
+                </div>
+                
+                <button class="action-btn save" id="savePostBtn" 
+                        style="display: none;"
+                        aria-describedby="save-help"
+                        aria-label="Sauvegarder le post généré">
+                    <svg class="icon" aria-hidden="true">
+                        <path d="M17 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c0 1.1.9 2 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z"/>
+                    </svg>
+                    <span id="savePostText">Sauvegarder ce post</span>
+                </button>
+                <div id="save-help" class="field-help" role="tooltip">
+                    Enregistre le post dans votre bibliothèque pour une utilisation ultérieure
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔍 Tests Automatiques</h2>
+            
+            <button id="runTests" class="generate-btn" style="margin-bottom: 20px;">
+                🚀 Lancer les Tests d'Affichage
+            </button>
+            
+            <div id="testResults" class="test-results" style="display: none;">
+                <h3>📊 Résultats des Tests d'Affichage</h3>
+                <div id="testResultsContent"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>📝 Instructions de Test Manuel</h2>
+            
+            <ol>
+                <li><strong>Test de Génération :</strong> Remplissez le formulaire et cliquez sur "Tester l'Affichage"</li>
+                <li><strong>Test d'Affichage :</strong> Vérifiez que le résultat apparaît dans la section "Votre post LinkedIn"</li>
+                <li><strong>Test de Formatage :</strong> Vérifiez que le texte est bien formaté avec paragraphes et hashtags</li>
+                <li><strong>Test des Boutons :</strong> Vérifiez que les boutons d'action sont visibles et fonctionnels</li>
+                <li><strong>Test de Scroll :</strong> Vérifiez que la page défile automatiquement vers le résultat</li>
+                <li><strong>Test de Responsive :</strong> Redimensionnez la fenêtre pour tester sur mobile</li>
+            </ol>
+        </div>
+        
+        <div class="test-section">
+            <h2>🐛 Informations de Débogage</h2>
+            
+            <div class="debug-info" id="debugInfo">
+                <strong>Console de débogage :</strong><br>
+                Les informations de débogage apparaîtront ici...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class DisplayTester {
+            constructor() {
+                this.form = document.getElementById('testForm');
+                this.generateBtn = document.getElementById('generateBtn');
+                this.runTestsBtn = document.getElementById('runTests');
+                this.testResults = document.getElementById('testResults');
+                this.testResultsContent = document.getElementById('testResultsContent');
+                this.debugInfo = document.getElementById('debugInfo');
+                this.postResult = document.getElementById('postResult');
+                this.postContent = document.getElementById('postContent');
+                this.savePostBtn = document.getElementById('savePostBtn');
+                
+                this.originalBtnText = '';
+                this.isGenerating = false;
+                
+                this.init();
+            }
+            
+            init() {
+                this.generateBtn.addEventListener('click', (e) => this.handleGenerate(e));
+                this.runTestsBtn.addEventListener('click', () => this.runAllTests());
+                this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+                
+                // Tests automatiques au chargement
+                setTimeout(() => this.runBasicTests(), 1000);
+                
+                this.log('🧪 Testeur d\'affichage initialisé');
+            }
+            
+            log(message) {
+                console.log(message);
+                this.debugInfo.innerHTML += `<br>${new Date().toLocaleTimeString()}: ${message}`;
+                this.debugInfo.scrollTop = this.debugInfo.scrollHeight;
+            }
+            
+            runBasicTests() {
+                this.log('🧪 Tests de base en cours...');
+                this.testElementExistence();
+                this.testElementVisibility();
+                this.testElementAccessibility();
+            }
+            
+            runAllTests() {
+                this.log('🚀 Lancement de tous les tests d\'affichage...');
+                this.testResults.style.display = 'block';
+                this.testResultsContent.innerHTML = '';
+                
+                const tests = [
+                    { name: 'Existence des Éléments', test: () => this.testElementExistence() },
+                    { name: 'Visibilité des Éléments', test: () => this.testElementVisibility() },
+                    { name: 'Accessibilité des Éléments', test: () => this.testElementAccessibility() },
+                    { name: 'Fonction d\'Affichage', test: () => this.testDisplayFunction() },
+                    { name: 'Formatage du Contenu', test: () => this.testContentFormatting() },
+                    { name: 'Gestion des États', test: () => this.testStateManagement() }
+                ];
+                
+                tests.forEach((test, index) => {
+                    setTimeout(() => {
+                        const result = test.test();
+                        this.displayTestResult(test.name, result);
+                    }, index * 300);
+                });
+            }
+            
+            testElementExistence() {
+                const elements = {
+                    postResult: !!this.postResult,
+                    postContent: !!this.postContent,
+                    savePostBtn: !!this.savePostBtn
+                };
+                
+                const allExist = Object.values(elements).every(Boolean);
+                const existingCount = Object.values(elements).filter(Boolean).length;
+                
+                this.log(`🔍 Existence des éléments: ${existingCount}/3 éléments trouvés`);
+                
+                return {
+                    success: allExist,
+                    score: existingCount,
+                    total: 3,
+                    message: `${existingCount}/3 éléments d'affichage existent`
+                };
+            }
+            
+            testElementVisibility() {
+                const postResultVisible = this.postResult.style.display !== 'none';
+                const postContentVisible = this.postContent.style.display !== 'none';
+                const savePostBtnVisible = this.savePostBtn.style.display !== 'none';
+                
+                const elements = [postResultVisible, postContentVisible, savePostBtnVisible];
+                const visibleCount = elements.filter(Boolean).length;
+                
+                this.log(`👁️ Visibilité des éléments: ${visibleCount}/3 éléments visibles`);
+                
+                return {
+                    success: visibleCount >= 2, // Au moins 2 éléments doivent être visibles
+                    score: visibleCount,
+                    total: 3,
+                    message: `${visibleCount}/3 éléments d'affichage sont visibles`
+                };
+            }
+            
+            testElementAccessibility() {
+                const hasRole = this.postResult.hasAttribute('role');
+                const hasAriaLive = this.postResult.hasAttribute('aria-live');
+                const hasAriaLabelledby = this.postResult.hasAttribute('aria-labelledby');
+                const hasTabIndex = this.postContent.hasAttribute('tabindex');
+                
+                const accessible = [hasRole, hasAriaLive, hasAriaLabelledby, hasTabIndex];
+                const accessibleCount = accessible.filter(Boolean).length;
+                
+                this.log(`♿ Accessibilité des éléments: ${accessibleCount}/4 attributs d'accessibilité`);
+                
+                return {
+                    success: accessibleCount >= 3,
+                    score: accessibleCount,
+                    total: 4,
+                    message: `${accessibleCount}/4 attributs d'accessibilité présents`
+                };
+            }
+            
+            testDisplayFunction() {
+                // Test de la fonction d'affichage
+                const testContent = "Test de contenu pour vérifier l'affichage";
+                this.displayPost(testContent);
+                
+                const contentDisplayed = this.postContent.textContent.includes('Test de contenu');
+                const resultVisible = this.postResult.classList.contains('visible');
+                
+                this.log(`📝 Test de fonction d'affichage: ${contentDisplayed ? 'Contenu affiché' : 'Contenu non affiché'}`);
+                
+                return {
+                    success: contentDisplayed && resultVisible,
+                    score: (contentDisplayed ? 1 : 0) + (resultVisible ? 1 : 0),
+                    total: 2,
+                    message: contentDisplayed && resultVisible ? 'Fonction d\'affichage fonctionnelle' : 'Problème avec la fonction d\'affichage'
+                };
+            }
+            
+            testContentFormatting() {
+                // Test du formatage du contenu
+                const testContent = "Premier paragraphe\n\nDeuxième paragraphe\n\n#Hashtag1 #Hashtag2";
+                this.displayPost(testContent);
+                
+                const hasParagraphs = this.postContent.innerHTML.includes('<p>');
+                const hasHashtags = this.postContent.innerHTML.includes('hashtag');
+                
+                this.log(`🎨 Test de formatage: Paragraphes=${hasParagraphs}, Hashtags=${hasHashtags}`);
+                
+                return {
+                    success: hasParagraphs && hasHashtags,
+                    score: (hasParagraphs ? 1 : 0) + (hasHashtags ? 1 : 0),
+                    total: 2,
+                    message: hasParagraphs && hasHashtags ? 'Formatage du contenu correct' : 'Problème de formatage'
+                };
+            }
+            
+            testStateManagement() {
+                // Test de la gestion des états
+                const initialState = this.postResult.style.display === 'none';
+                this.displayPost("Test de gestion d'état");
+                const finalState = this.postResult.style.display !== 'none';
+                
+                const stateChanged = initialState !== finalState;
+                
+                this.log(`🔄 Test de gestion d'état: ${stateChanged ? 'État changé' : 'État inchangé'}`);
+                
+                return {
+                    success: stateChanged,
+                    score: stateChanged ? 1 : 0,
+                    total: 1,
+                    message: stateChanged ? 'Gestion des états fonctionnelle' : 'Problème de gestion des états'
+                };
+            }
+            
+            displayPost(content) {
+                this.log(`🔍 displayPost appelé avec: ${content.substring(0, 50)}...`);
+                
+                // Validation du contenu
+                if (!content || typeof content !== 'string') {
+                    this.log('❌ Contenu invalide');
+                    return;
+                }
+                
+                if (!this.postContent || !this.postResult) {
+                    this.log('❌ Éléments manquants');
+                    return;
+                }
+                
+                try {
+                    // Nettoyer le contenu précédent
+                    this.postContent.innerHTML = '';
+                    
+                    // Formater et afficher le nouveau contenu
+                    const formattedContent = content
+                        .replace(/\n\n/g, '</p><p>') // Paragraphes
+                        .replace(/\n/g, '<br>') // Retours à la ligne
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Gras
+                        .replace(/\*(.*?)\*/g, '<em>$1</em>') // Italique
+                        .replace(/#(\w+)/g, '<span class="hashtag">#$1</span>'); // Hashtags
+                    
+                    // Créer la structure HTML
+                    const htmlContent = `<p>${formattedContent}</p>`;
+                    this.postContent.innerHTML = htmlContent;
+                    
+                    // Afficher la section de résultat
+                    this.postResult.style.display = 'block';
+                    this.postResult.classList.add('visible');
+                    
+                    // Afficher le bouton de sauvegarde
+                    if (this.savePostBtn) {
+                        this.savePostBtn.style.display = 'inline-flex';
+                    }
+                    
+                    // Scroll vers le résultat
+                    this.postResult.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    
+                    this.log('✅ Post affiché avec succès');
+                    
+                } catch (error) {
+                    this.log(`❌ Erreur lors de l'affichage: ${error.message}`);
+                }
+            }
+            
+            displayTestResult(testName, result) {
+                const testItem = document.createElement('div');
+                testItem.className = `test-item ${result.success ? 'success' : 'error'}`;
+                
+                const status = result.success ? '✅' : '❌';
+                testItem.innerHTML = `
+                    <strong>${status} ${testName}</strong><br>
+                    <span>${result.message}</span><br>
+                    <small>Score: ${result.score}/${result.total}</small>
+                `;
+                
+                this.testResultsContent.appendChild(testItem);
+                
+                // Animation d'apparition
+                testItem.style.opacity = '0';
+                testItem.style.transform = 'translateY(20px)';
+                testItem.style.transition = 'all 0.3s ease';
+                
+                setTimeout(() => {
+                    testItem.style.opacity = '1';
+                    testItem.style.transform = 'translateY(0)';
+                }, 100);
+            }
+            
+            handleSubmit(e) {
+                e.preventDefault();
+                this.log('📝 Soumission du formulaire...');
+                
+                // Validation
+                const formData = new FormData(this.form);
+                const errors = [];
+                
+                if (!formData.get('subject')) errors.push('Sujet du post');
+                if (!formData.get('audience')) errors.push('Audience cible');
+                if (!formData.get('tone')) errors.push('Ton du message');
+                if (!formData.get('postLanguage')) errors.push('Langue du post');
+                if (!formData.get('ollamaModel')) errors.push('Modèle IA');
+                
+                if (errors.length > 0) {
+                    this.log(`❌ Erreurs de validation: ${errors.join(', ')}`);
+                    alert(`Veuillez remplir les champs suivants : ${errors.join(', ')}`);
+                } else {
+                    this.log('✅ Formulaire valide, simulation de génération...');
+                    this.simulateGeneration();
+                }
+            }
+            
+            handleGenerate(e) {
+                e.preventDefault();
+                this.log('🚀 Clic sur le bouton de génération...');
+                
+                if (this.isGenerating) {
+                    this.log('⚠️ Génération déjà en cours...');
+                    return;
+                }
+                
+                this.simulateGeneration();
+            }
+            
+            simulateGeneration() {
+                this.log('🎭 Début de la simulation de génération...');
+                
+                // Simuler une génération
+                this.setLoadingState(true);
+                
+                setTimeout(() => {
+                    this.setLoadingState(false);
+                    
+                    // Simuler un résultat
+                    const mockPost = `🎯 Test d'affichage réussi !
+
+Ceci est un post de test généré pour vérifier que l'affichage du résultat fonctionne correctement.
+
+✅ Tous les paramètres ont été pris en compte :
+- Sujet : ${document.getElementById('testSubject').value.substring(0, 50)}...
+- Audience : ${document.getElementById('testAudience').value}
+- Ton : ${document.getElementById('testTone').value}
+- Langue : ${document.getElementById('testLanguage').value}
+- Modèle : ${document.getElementById('testModel').value}
+
+🚀 L'affichage fonctionne parfaitement !
+
+#Test #Affichage #LinkedIn #PostSocial #Interface`;
+
+                    this.log('✅ Simulation terminée avec succès');
+                    this.displayPost(mockPost);
+                    
+                }, 2000);
+            }
+            
+            setLoadingState(isLoading) {
+                this.log(`🔄 Changement d'état: ${isLoading ? 'Chargement' : 'Normal'}`);
+                
+                if (isLoading) {
+                    if (!this.originalBtnText) {
+                        this.originalBtnText = this.generateBtn.innerHTML;
+                    }
+                    
+                    this.generateBtn.disabled = true;
+                    this.generateBtn.classList.add('loading-state');
+                    
+                    this.generateBtn.innerHTML = `
+                        <span class="loading-spinner"></span>
+                        <span>Génération...</span>
+                    `;
+                    
+                    this.isGenerating = true;
+                } else {
+                    this.generateBtn.disabled = false;
+                    this.generateBtn.classList.remove('loading-state');
+                    
+                    if (this.originalBtnText) {
+                        this.generateBtn.innerHTML = this.originalBtnText;
+                    }
+                    
+                    this.isGenerating = false;
+                }
+            }
+        }
+        
+        // Initialiser le testeur
+        document.addEventListener('DOMContentLoaded', () => {
+            new DisplayTester();
+        });
+    </script>
+</body>
+</html>

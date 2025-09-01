@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Correction Navigation - LinkedINPost</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .test-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .test-result {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        .success { border-left: 4px solid #4CAF50; }
+        .error { border-left: 4px solid #F44336; }
+        .info { border-left: 4px solid #2196F3; }
+        .warning { border-left: 4px solid #FF9800; }
+        
+        button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .auth-container {
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            background: linear-gradient(135deg, #0077b5, #00a0dc);
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        
+        .auth-page {
+            display: none;
+            width: 100%;
+            max-width: 450px;
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        .auth-page.active {
+            display: block;
+        }
+        
+        .auth-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            color: #333;
+        }
+        
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .auth-header h1 {
+            color: #0077b5;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #0077b5;
+            box-shadow: 0 0 0 3px rgba(0, 119, 181, 0.1);
+        }
+        
+        .auth-btn {
+            background: linear-gradient(45deg, #0077b5, #00a0dc);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 119, 181, 0.3);
+        }
+        
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e1e5e9;
+        }
+        
+        .auth-link {
+            color: #0077b5;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .auth-link:hover {
+            background: rgba(0, 119, 181, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-success { background: #4CAF50; }
+        .status-error { background: #F44336; }
+        .status-info { background: #2196F3; }
+        
+        .debug-info {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Test de la Correction de Navigation - LinkedINPost</h1>
+    
+    <div class="test-container">
+        <h2>🔍 Test de la Correction du Bouton "Créer un compte"</h2>
+        <p>Ce test vérifie que la correction de navigation fonctionne et que le bouton "Créer un compte" est maintenant opérationnel.</p>
+        
+        <button onclick="testCorrection()">🧪 Tester la Correction</button>
+        <button onclick="testManualNavigation()">👆 Test Manuel</button>
+        <button onclick="showDebugInfo()">🐛 Informations de Debug</button>
+        <button onclick="resetTest()">🔄 Réinitialiser</button>
+        
+        <div id="test-results"></div>
+    </div>
+    
+    <div class="test-container">
+        <h2>📱 Interface de Test avec Correction</h2>
+        <p>Cette interface utilise la correction de navigation pour tester le bouton "Créer un compte" :</p>
+        
+        <div class="auth-container">
+            <!-- Page de connexion -->
+            <div class="auth-page active" id="loginPage" data-page="login">
+                <div class="auth-card">
+                    <div class="auth-header">
+                        <h1>Connexion</h1>
+                        <p>Accédez à votre espace LinkedINPost</p>
+                    </div>
+                    
+                    <form class="auth-form" id="loginForm">
+                        <div class="form-group">
+                            <input type="email" id="loginEmail" placeholder="Adresse email" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="password" id="loginPassword" placeholder="Mot de passe" required>
+                        </div>
+                        <button type="submit" class="auth-btn">Se connecter</button>
+                    </form>
+                    
+                    <div class="auth-footer">
+                        <p>Pas encore de compte ?</p>
+                        <a href="#" class="auth-link" id="showSignupLink">Créer un compte</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Page d'inscription -->
+            <div class="auth-page" id="signupPage" data-page="signup">
+                <div class="auth-card">
+                    <div class="auth-header">
+                        <h1>Inscription</h1>
+                        <p>Créez votre compte LinkedINPost</p>
+                    </div>
+                    
+                    <form class="auth-form" id="signupForm">
+                        <div class="form-group">
+                            <input type="text" id="signupName" placeholder="Nom complet" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" id="signupEmail" placeholder="Adresse email" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="password" id="signupPassword" placeholder="Mot de passe (min. 6 caractères)" required minlength="6">
+                        </div>
+                        <button type="submit" class="auth-btn">Créer mon compte</button>
+                    </form>
+                    
+                    <div class="auth-footer">
+                        <p>Déjà un compte ?</p>
+                        <a href="#" class="auth-link" id="showLoginLink">Se connecter</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charger la correction de navigation -->
+    <script src="fix-navigation.js"></script>
+    
+    <script>
+        class CorrectionTester {
+            constructor() {
+                this.currentPage = 'login';
+                this.testResults = document.getElementById('test-results');
+                this.setupEventListeners();
+                this.log('🧪 Testeur de correction initialisé', 'info');
+            }
+            
+            setupEventListeners() {
+                // Navigation vers l'inscription (avec correction)
+                document.getElementById('showSignupLink')?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.log('🔗 Clic sur "Créer un compte" détecté', 'info');
+                    this.navigateToSignup();
+                });
+                
+                // Navigation vers la connexion
+                document.getElementById('showLoginLink')?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.log('🔗 Clic sur "Se connecter" détecté', 'info');
+                    this.navigateToLogin();
+                });
+                
+                // Formulaires
+                document.getElementById('loginForm')?.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.log('📝 Tentative de connexion (simulée)', 'info');
+                });
+                
+                document.getElementById('signupForm')?.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.log('📝 Tentative d\'inscription (simulée)', 'info');
+                });
+            }
+            
+            navigateToSignup() {
+                this.log('🔄 Navigation vers la page d\'inscription...', 'info');
+                
+                // Masquer la page de connexion
+                const loginPage = document.getElementById('loginPage');
+                if (loginPage) {
+                    loginPage.classList.remove('active');
+                    loginPage.style.display = 'none';
+                }
+                
+                // Afficher la page d'inscription
+                const signupPage = document.getElementById('signupPage');
+                if (signupPage) {
+                    signupPage.classList.add('active');
+                    signupPage.style.display = 'block';
+                    
+                    // Pré-remplir le formulaire si possible
+                    const loginEmail = document.getElementById('loginEmail')?.value;
+                    const loginPassword = document.getElementById('loginPassword')?.value;
+                    
+                    if (loginEmail && loginPassword) {
+                        const signupEmail = document.getElementById('signupEmail');
+                        const signupPassword = document.getElementById('signupPassword');
+                        
+                        if (signupEmail && signupPassword) {
+                            signupEmail.value = loginEmail;
+                            signupPassword.value = loginPassword;
+                            this.log('✅ Formulaire pré-rempli avec les identifiants de connexion', 'success');
+                        }
+                    }
+                    
+                    this.currentPage = 'signup';
+                    this.log('✅ Navigation vers l\'inscription réussie', 'success');
+                } else {
+                    this.log('❌ Page d\'inscription non trouvée', 'error');
+                }
+            }
+            
+            navigateToLogin() {
+                this.log('🔄 Navigation vers la page de connexion...', 'info');
+                
+                // Masquer la page d'inscription
+                const signupPage = document.getElementById('signupPage');
+                if (signupPage) {
+                    signupPage.classList.remove('active');
+                    signupPage.style.display = 'none';
+                }
+                
+                // Afficher la page de connexion
+                const loginPage = document.getElementById('loginPage');
+                if (loginPage) {
+                    loginPage.classList.add('active');
+                    loginPage.style.display = 'block';
+                    this.currentPage = 'login';
+                    this.log('✅ Navigation vers la connexion réussie', 'success');
+                } else {
+                    this.log('❌ Page de connexion non trouvée', 'error');
+                }
+            }
+            
+            testCorrection() {
+                this.log('🧪 Test de la correction de navigation...', 'info');
+                
+                // Vérifier que la correction est chargée
+                if (window.navigationFix) {
+                    this.log('✅ Module de correction chargé', 'success');
+                    
+                    // Vérifier que le bouton fonctionne
+                    const showSignupLink = document.getElementById('showSignupLink');
+                    if (showSignupLink) {
+                        this.log('✅ Bouton "Créer un compte" trouvé', 'success');
+                        
+                        // Simuler un clic
+                        setTimeout(() => {
+                            this.log('🔄 Simulation d\'un clic sur "Créer un compte"...', 'info');
+                            showSignupLink.click();
+                        }, 500);
+                        
+                    } else {
+                        this.log('❌ Bouton "Créer un compte" non trouvé', 'error');
+                    }
+                } else {
+                    this.log('❌ Module de correction non chargé', 'error');
+                }
+            }
+            
+            testManualNavigation() {
+                this.log('👆 Test manuel de navigation', 'info');
+                this.log('Cliquez sur "Créer un compte" puis "Se connecter" pour tester manuellement', 'info');
+            }
+            
+            showDebugInfo() {
+                this.log('🐛 Informations de debug:', 'info');
+                
+                const debugInfo = {
+                    'Navigation Fix Loaded': !!window.navigationFix,
+                    'Current Page': this.currentPage,
+                    'Login Page Visible': document.getElementById('loginPage')?.style.display !== 'none',
+                    'Signup Page Visible': document.getElementById('signupPage')?.style.display !== 'none',
+                    'Show Signup Link': !!document.getElementById('showSignupLink'),
+                    'Show Login Link': !!document.getElementById('showLoginLink'),
+                    'Login Form': !!document.getElementById('loginForm'),
+                    'Signup Form': !!document.getElementById('signupForm')
+                };
+                
+                Object.entries(debugInfo).forEach(([key, value]) => {
+                    this.log(`${key}: ${value ? '✅' : '❌'}`, value ? 'success' : 'error');
+                });
+            }
+            
+            resetTest() {
+                this.log('🔄 Réinitialisation du test...', 'info');
+                
+                // Remettre la page de connexion active
+                const loginPage = document.getElementById('loginPage');
+                const signupPage = document.getElementById('signupPage');
+                
+                if (loginPage) {
+                    loginPage.classList.add('active');
+                    loginPage.style.display = 'block';
+                }
+                
+                if (signupPage) {
+                    signupPage.classList.remove('active');
+                    signupPage.style.display = 'none';
+                }
+                
+                this.currentPage = 'login';
+                
+                // Vider les formulaires
+                document.getElementById('loginForm')?.reset();
+                document.getElementById('signupForm')?.reset();
+                
+                this.log('✅ Test réinitialisé. Page de connexion active', 'success');
+            }
+            
+            log(message, type = 'info') {
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = document.createElement('div');
+                logEntry.className = `test-result ${type}`;
+                
+                const statusClass = type === 'success' ? 'status-success' : 
+                                  type === 'error' ? 'status-error' : 'status-info';
+                
+                logEntry.innerHTML = `
+                    <span class="status-indicator ${statusClass}"></span>
+                    <strong>[${timestamp}]</strong> ${message}
+                `;
+                
+                this.testResults.appendChild(logEntry);
+                this.testResults.scrollTop = this.testResults.scrollHeight;
+                
+                // Limiter le nombre d'entrées
+                if (this.testResults.children.length > 20) {
+                    this.testResults.removeChild(this.testResults.firstChild);
+                }
+                
+                console.log(`[${type.toUpperCase()}] ${message}`);
+            }
+        }
+        
+        // Initialiser le testeur
+        let correctionTester;
+        
+        window.addEventListener('load', () => {
+            // Attendre que la correction soit chargée
+            setTimeout(() => {
+                correctionTester = new CorrectionTester();
+                console.log('🚀 Testeur de correction chargé');
+                
+                // Test automatique après 2 secondes
+                setTimeout(() => {
+                    correctionTester.log('🚀 Test automatique de la correction...', 'info');
+                    correctionTester.testCorrection();
+                }, 2000);
+            }, 1000);
+        });
+        
+        // Fonctions globales pour les boutons
+        function testCorrection() {
+            if (correctionTester) {
+                correctionTester.testCorrection();
+            }
+        }
+        
+        function testManualNavigation() {
+            if (correctionTester) {
+                correctionTester.testManualNavigation();
+            }
+        }
+        
+        function showDebugInfo() {
+            if (correctionTester) {
+                correctionTester.showDebugInfo();
+            }
+        }
+        
+        function resetTest() {
+            if (correctionTester) {
+                correctionTester.resetTest();
+            }
+        }
+    </script>
+</body>
+</html>

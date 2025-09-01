@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Couleurs des Champs de Saisie - LinkedINPost</title>
+    
+    <!-- Styles de base -->
+    <link rel="stylesheet" href="design-fixes.css">
+    <link rel="stylesheet" href="accessibility-fixes.css">
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+        
+        .test-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            background: #f8f9fa;
+        }
+        
+        .test-section h2 {
+            color: #0077b5;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .required {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .field-help {
+            font-size: 13px;
+            color: #495057;
+            margin-top: 6px;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            border-left: 3px solid #0077b5;
+        }
+        
+        .color-test {
+            background: #e8f5e8;
+            border: 1px solid #27ae60;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .color-test h3 {
+            color: #27ae60;
+            margin-top: 0;
+        }
+        
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .color-item {
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .color-item.light {
+            color: #2c3e50;
+            border: 1px solid #e1e8ed;
+        }
+        
+        .color-item.primary { background-color: #0077b5; }
+        .color-item.secondary { background-color: #00a0dc; }
+        .color-item.success { background-color: #27ae60; }
+        .color-item.error { background-color: #e74c3c; }
+        .color-item.warning { background-color: #f39c12; }
+        .color-item.text-primary { background-color: #2c3e50; }
+        .color-item.text-secondary { background-color: #6c757d; }
+        .color-item.bg-primary { background-color: #ffffff; color: #2c3e50; border: 1px solid #e1e8ed; }
+        .color-item.bg-secondary { background-color: #f8f9fa; color: #2c3e50; border: 1px solid #e1e8ed; }
+        
+        .contrast-test {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .contrast-test h3 {
+            color: #856404;
+            margin-top: 0;
+        }
+        
+        .test-field {
+            margin: 10px 0;
+            padding: 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            background: white;
+        }
+        
+        .test-field h4 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        
+        .test-field input,
+        .test-field select,
+        .test-field textarea {
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        .dark-mode-toggle {
+            background: #2c3e50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 20px 0;
+        }
+        
+        .dark-mode-toggle:hover {
+            background: #34495e;
+        }
+        
+        .accessibility-info {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .accessibility-info h3 {
+            color: #2196f3;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Test des Couleurs des Champs de Saisie</h1>
+        
+        <div class="accessibility-info">
+            <h3>📋 Objectif du Test</h3>
+            <p>Ce test vérifie que les couleurs des champs de saisie sont correctes et visibles, avec un bon contraste pour l'accessibilité.</p>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔍 Test de Visibilité des Couleurs</h2>
+            
+            <div class="color-test">
+                <h3>🎨 Palette de Couleurs Utilisées</h3>
+                <div class="color-palette">
+                    <div class="color-item primary">#0077b5<br>Primaire</div>
+                    <div class="color-item secondary">#00a0dc<br>Secondaire</div>
+                    <div class="color-item success">#27ae60<br>Succès</div>
+                    <div class="color-item error">#e74c3c<br>Erreur</div>
+                    <div class="color-item warning">#f39c12<br>Avertissement</div>
+                    <div class="color-item text-primary">#2c3e50<br>Texte Principal</div>
+                    <div class="color-item text-secondary">#6c757d<br>Texte Secondaire</div>
+                    <div class="color-item bg-primary">#ffffff<br>Fond Principal</div>
+                    <div class="color-item bg-secondary">#f8f9fa<br>Fond Secondaire</div>
+                </div>
+            </div>
+            
+            <div class="contrast-test">
+                <h3>📊 Test de Contraste</h3>
+                <p><strong>Objectif :</strong> Vérifier que le contraste entre le texte et le fond respecte les standards d'accessibilité (ratio minimum 4.5:1).</p>
+                <p><strong>Test :</strong> Tous les textes doivent être clairement lisibles sur leur arrière-plan respectif.</p>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🧪 Test des Champs de Saisie</h2>
+            
+            <form id="testForm">
+                <div class="test-field">
+                    <h4>📝 Champ de Texte (Input)</h4>
+                    <label for="testInput">Test Input :</label>
+                    <input type="text" id="testInput" 
+                           placeholder="Placeholder visible en gris"
+                           value="Texte de test en couleur sombre sur fond blanc">
+                    <div class="field-help">Ce champ doit avoir un texte sombre (#2c3e50) sur fond blanc (#ffffff)</div>
+                </div>
+                
+                <div class="test-field">
+                    <h4>📝 Zone de Texte (Textarea)</h4>
+                    <label for="testTextarea">Test Textarea :</label>
+                    <textarea id="testTextarea" rows="3" 
+                              placeholder="Placeholder visible en gris pour textarea"
+                              >Texte de test en couleur sombre sur fond blanc dans une zone de texte</textarea>
+                    <div class="field-help">Ce champ doit avoir un texte sombre (#2c3e50) sur fond blanc (#ffffff)</div>
+                </div>
+                
+                <div class="test-field">
+                    <h4>📋 Menu Déroulant (Select)</h4>
+                    <label for="testSelect">Test Select :</label>
+                    <select id="testSelect">
+                        <option value="">Option par défaut en gris</option>
+                        <option value="1">Option 1 en couleur sombre</option>
+                        <option value="2">Option 2 en couleur sombre</option>
+                        <option value="3">Option 3 en couleur sombre</option>
+                    </select>
+                    <div class="field-help">Ce champ doit avoir un texte sombre (#2c3e50) sur fond blanc (#ffffff)</div>
+                </div>
+                
+                <div class="test-field">
+                    <h4>📧 Champ Email</h4>
+                    <label for="testEmail">Test Email :</label>
+                    <input type="email" id="testEmail" 
+                           placeholder="email@exemple.com"
+                           value="test@exemple.com">
+                    <div class="field-help">Ce champ doit avoir un texte sombre (#2c3e50) sur fond blanc (#ffffff)</div>
+                </div>
+                
+                <div class="test-field">
+                    <h4>🔒 Champ Mot de Passe</h4>
+                    <label for="testPassword">Test Password :</label>
+                    <input type="password" id="testPassword" 
+                           placeholder="Mot de passe"
+                           value="password123">
+                    <div class="field-help">Ce champ doit avoir un texte sombre (#2c3e50) sur fond blanc (#ffffff)</div>
+                </div>
+            </form>
+        </div>
+        
+        <div class="test-section">
+            <h2>🌙 Test du Mode Sombre</h2>
+            
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()">
+                🌙 Basculer en Mode Sombre
+            </button>
+            
+            <div class="color-test">
+                <h3>🎨 Couleurs en Mode Sombre</h3>
+                <p>En mode sombre, les champs doivent avoir :</p>
+                <ul>
+                    <li><strong>Fond :</strong> #2d2d2d (gris foncé)</li>
+                    <li><strong>Texte :</strong> #ffffff (blanc)</li>
+                    <li><strong>Bordure :</strong> #404040 (gris moyen)</li>
+                    <li><strong>Focus :</strong> #4da6ff (bleu clair)</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>✅ Checklist de Validation</h2>
+            
+            <div class="color-test">
+                <h3>🎯 Critères de Validation</h3>
+                <ul>
+                    <li>✅ <strong>Texte visible :</strong> Le texte dans les champs doit être clairement lisible</li>
+                    <li>✅ <strong>Placeholder visible :</strong> Les placeholders doivent être visibles en gris (#95a5a6)</li>
+                    <li>✅ <strong>Contraste suffisant :</strong> Ratio de contraste minimum de 4.5:1</li>
+                    <li>✅ <strong>États de focus :</strong> Bordure bleue (#0077b5) avec ombre portée</li>
+                    <li>✅ <strong>États de validation :</strong> Couleurs distinctes pour valide/invalide</li>
+                    <li>✅ <strong>Mode sombre :</strong> Adaptation automatique des couleurs</li>
+                    <li>✅ <strong>Options des menus :</strong> Lisibles dans les menus déroulants</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>🔧 Instructions de Test</h2>
+            
+            <ol>
+                <li><strong>Test de Visibilité :</strong> Vérifiez que tous les textes sont visibles sur leurs arrière-plans</li>
+                <li><strong>Test des Placeholders :</strong> Vérifiez que les placeholders sont visibles en gris</li>
+                <li><strong>Test de Focus :</strong> Cliquez sur chaque champ pour vérifier la bordure bleue</li>
+                <li><strong>Test des Menus :</strong> Ouvrez les menus déroulants pour vérifier la lisibilité des options</li>
+                <li><strong>Test du Mode Sombre :</strong> Utilisez le bouton pour basculer et vérifier l'adaptation</li>
+                <li><strong>Test de Contraste :</strong> Vérifiez que tous les textes respectent les standards d'accessibilité</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        let isDarkMode = false;
+        
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            const body = document.body;
+            const container = document.querySelector('.container');
+            const button = document.querySelector('.dark-mode-toggle');
+            
+            if (isDarkMode) {
+                body.style.backgroundColor = '#1a1a1a';
+                container.style.backgroundColor = '#2d2d2d';
+                container.style.color = '#ffffff';
+                button.textContent = '☀️ Basculer en Mode Clair';
+                button.style.backgroundColor = '#4da6ff';
+                
+                // Appliquer le mode sombre aux champs
+                document.querySelectorAll('input, select, textarea').forEach(field => {
+                    field.style.backgroundColor = '#2d2d2d';
+                    field.style.color = '#ffffff';
+                    field.style.borderColor = '#404040';
+                });
+                
+                document.querySelectorAll('label').forEach(label => {
+                    label.style.color = '#ffffff';
+                });
+                
+                document.querySelectorAll('.field-help').forEach(help => {
+                    help.style.backgroundColor = '#404040';
+                    help.style.color = '#cccccc';
+                });
+                
+            } else {
+                body.style.backgroundColor = '';
+                container.style.backgroundColor = '';
+                container.style.color = '';
+                button.textContent = '🌙 Basculer en Mode Sombre';
+                button.style.backgroundColor = '';
+                
+                // Restaurer le mode clair
+                document.querySelectorAll('input, select, textarea').forEach(field => {
+                    field.style.backgroundColor = '';
+                    field.style.color = '';
+                    field.style.borderColor = '';
+                });
+                
+                document.querySelectorAll('label').forEach(label => {
+                    label.style.color = '';
+                });
+                
+                document.querySelectorAll('.field-help').forEach(help => {
+                    help.style.backgroundColor = '';
+                    help.style.color = '';
+                });
+            }
+        }
+        
+        // Test automatique des couleurs au chargement
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🎨 Test des couleurs des champs de saisie chargé');
+            
+            // Vérifier que les champs ont les bonnes couleurs
+            const fields = document.querySelectorAll('input, select, textarea');
+            fields.forEach(field => {
+                const style = window.getComputedStyle(field);
+                console.log(`Champ ${field.id}:`, {
+                    backgroundColor: style.backgroundColor,
+                    color: style.color,
+                    borderColor: style.borderColor
+                });
+            });
+        });
+    </script>
+</body>
+</html>

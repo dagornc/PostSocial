@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - LinkedINPost Utils</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test des Utilitaires LinkedINPost</h1>
+    
+    <div class="test-section">
+        <h2>1. Test de Configuration</h2>
+        <button onclick="testConfig()">Tester la Configuration</button>
+        <div id="config-result" class="test-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Test de Validation</h2>
+        <input type="email" id="test-email" placeholder="Email à tester">
+        <input type="password" id="test-password" placeholder="Mot de passe à tester">
+        <button onclick="testValidation()">Tester la Validation</button>
+        <div id="validation-result" class="test-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Test de Gestion d'Erreurs</h2>
+        <button onclick="testErrorHandler()">Tester la Gestion d'Erreurs</button>
+        <div id="error-result" class="test-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Test de Stockage</h2>
+        <input type="text" id="test-key" placeholder="Clé de test" value="test-key">
+        <input type="text" id="test-value" placeholder="Valeur de test" value="test-value">
+        <button onclick="testStorage()">Tester le Stockage</button>
+        <div id="storage-result" class="test-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>5. Test de Connectivité</h2>
+        <button onclick="testConnectivity()">Tester la Connectivité</button>
+        <div id="connectivity-result" class="test-result"></div>
+    </div>
+
+    <!-- Charger les fichiers utilitaires -->
+    <script src="config.js"></script>
+    <script src="utils.js"></script>
+    
+    <script>
+        // Tests des fonctionnalités
+        function testConfig() {
+            const result = document.getElementById('config-result');
+            try {
+                const config = window.LinkedINPostConfig.config;
+                result.innerHTML = `
+                    <div class="success">
+                        ✅ Configuration chargée avec succès<br>
+                        App: ${config.app.name} v${config.app.version}<br>
+                        Supabase URL: ${config.supabase.url}<br>
+                        Ollama URL: ${config.ollama.baseUrl}
+                    </div>
+                `;
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ Erreur: ${error.message}</div>`;
+            }
+        }
+        
+        function testValidation() {
+            const result = document.getElementById('validation-result');
+            const email = document.getElementById('test-email').value;
+            const password = document.getElementById('test-password').value;
+            
+            try {
+                const config = window.LinkedINPostConfig.config;
+                const validator = new window.LinkedINPostUtils.Validator(config);
+                
+                const emailValid = validator.validateEmail(email);
+                const passwordValid = validator.validatePassword(password);
+                
+                result.innerHTML = `
+                    <div class="info">
+                        📧 Email "${email}": ${emailValid ? '✅ Valide' : '❌ Invalide'}<br>
+                        🔑 Mot de passe: ${passwordValid.valid ? '✅ Valide' : '❌ ' + passwordValid.message}
+                    </div>
+                `;
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ Erreur: ${error.message}</div>`;
+            }
+        }
+        
+        function testErrorHandler() {
+            const result = document.getElementById('error-result');
+            
+            try {
+                const config = window.LinkedINPostConfig.config;
+                const errorHandler = new window.LinkedINPostUtils.ErrorHandler(config);
+                
+                // Simuler une erreur
+                const testError = new Error('Erreur de test pour vérifier le système');
+                errorHandler.handleError(testError, 'test', 'fr');
+                
+                result.innerHTML = `
+                    <div class="success">
+                        ✅ Gestionnaire d'erreurs testé<br>
+                        Une notification d'erreur devrait apparaître
+                    </div>
+                `;
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ Erreur: ${error.message}</div>`;
+            }
+        }
+        
+        function testStorage() {
+            const result = document.getElementById('storage-result');
+            const key = document.getElementById('test-key').value;
+            const value = document.getElementById('test-value').value;
+            
+            try {
+                const storage = window.LinkedINPostUtils.StorageUtils;
+                
+                // Test d'écriture
+                const writeSuccess = storage.setItem(key, value);
+                
+                // Test de lecture
+                const readValue = storage.getItem(key);
+                
+                // Test de suppression
+                const deleteSuccess = storage.removeItem(key);
+                
+                result.innerHTML = `
+                    <div class="success">
+                        ✅ Tests de stockage réussis<br>
+                        Écriture: ${writeSuccess ? '✅' : '❌'}<br>
+                        Lecture: ${readValue === value ? '✅' : '❌'}<br>
+                        Suppression: ${deleteSuccess ? '✅' : '❌'}
+                    </div>
+                `;
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ Erreur: ${error.message}</div>`;
+            }
+        }
+        
+        async function testConnectivity() {
+            const result = document.getElementById('connectivity-result');
+            
+            try {
+                const config = window.LinkedINPostConfig.config;
+                const network = new window.LinkedINPostUtils.NetworkUtils(config);
+                
+                result.innerHTML = '<div class="info">🔄 Test de connectivité en cours...</div>';
+                
+                const isConnected = await network.checkConnectivity();
+                
+                result.innerHTML = `
+                    <div class="${isConnected ? 'success' : 'error'}">
+                        ${isConnected ? '✅' : '❌'} Connectivité: ${isConnected ? 'OK' : 'Échec'}
+                    </div>
+                `;
+            } catch (error) {
+                result.innerHTML = `<div class="error">❌ Erreur: ${error.message}</div>`;
+            }
+        }
+        
+        // Test automatique au chargement
+        window.addEventListener('load', () => {
+            console.log('🚀 Tests chargés, vérification des dépendances...');
+            
+            if (window.LinkedINPostConfig && window.LinkedINPostUtils) {
+                console.log('✅ Toutes les dépendances sont chargées');
+                document.body.style.backgroundColor = '#e8f5e8';
+            } else {
+                console.error('❌ Dépendances manquantes');
+                document.body.style.backgroundColor = '#ffe8e8';
+            }
+        });
+    </script>
+</body>
+</html>

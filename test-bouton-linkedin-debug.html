@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Bouton LinkedIn - Debug</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 30px;
+        }
+        
+        .test-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #0077b5 0%, #667eea 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .post-result {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .post-result.show {
+            display: block;
+        }
+        
+        .post-content {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        
+        .publish-section {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .publish-btn {
+            background: linear-gradient(135deg, #0077b5 0%, #667eea 100%);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .publish-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .publish-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .icon {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+        
+        .log {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        
+        .log-entry {
+            margin: 5px 0;
+            padding: 3px 0;
+        }
+        
+        .success { color: #2ecc71; }
+        .error { color: #e74c3c; }
+        .info { color: #3498db; }
+        .warning { color: #f39c12; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Test Debug - Bouton Publication LinkedIn</h1>
+        <p>Test pour identifier pourquoi le bouton reste inactif</p>
+        
+        <div class="test-section">
+            <h3>🧪 Tests de Fonctionnement</h3>
+            <button class="btn" onclick="simulatePostGeneration()">
+                📝 Simuler Génération de Post
+            </button>
+            <button class="btn" onclick="showButton()">
+                👁️ Forcer Affichage Bouton
+            </button>
+            <button class="btn" onclick="enableButton()">
+                ✅ Activer Bouton
+            </button>
+            <button class="btn" onclick="testClick()">
+                🔗 Test Clic
+            </button>
+            <button class="btn" onclick="clearLogs()">
+                🗑️ Vider Logs
+            </button>
+        </div>
+        
+        <!-- Zone de résultat (réplique de l'original) -->
+        <div class="post-result" id="postResult">
+            <h3>Votre post LinkedIn :</h3>
+            <div class="post-content" id="postContent">
+                <!-- Contenu généré apparaîtra ici -->
+            </div>
+            
+            <!-- Bouton de publication LinkedIn (réplique exacte) -->
+            <div class="publish-section">
+                <button class="publish-btn" id="publishLinkedInBtn" 
+                        style="display: none;"
+                        aria-label="Publier le post sur votre profil LinkedIn">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                    </svg>
+                    <span>Publier le Post sur votre LinkedIn</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>📊 État du Bouton</h3>
+            <p><strong>Statut :</strong> <span id="buttonStatus">Non testé</span></p>
+            <p><strong>Visible :</strong> <span id="buttonVisible">Non testé</span></p>
+            <p><strong>Activé :</strong> <span id="buttonEnabled">Non testé</span></p>
+            <p><strong>Event Listener :</strong> <span id="buttonListener">Non testé</span></p>
+        </div>
+        
+        <div class="test-section">
+            <h3>📝 Logs de Debug</h3>
+            <div class="log" id="logContainer">
+                <div class="log-entry info">[INFO] Test de debug initialisé</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        class LinkedInButtonTester {
+            constructor() {
+                this.logContainer = document.getElementById('logContainer');
+                this.publishBtn = null;
+                this.init();
+            }
+            
+            init() {
+                this.log('🔍 Initialisation du testeur...', 'info');
+                this.cacheElements();
+                this.setupEventListeners();
+                this.checkButtonState();
+                this.log('✅ Testeur initialisé', 'success');
+            }
+            
+            cacheElements() {
+                this.log('📋 Mise en cache des éléments...', 'info');
+                
+                this.elements = {
+                    postResult: document.getElementById('postResult'),
+                    postContent: document.getElementById('postContent'),
+                    publishLinkedInBtn: document.getElementById('publishLinkedInBtn'),
+                    buttonStatus: document.getElementById('buttonStatus'),
+                    buttonVisible: document.getElementById('buttonVisible'),
+                    buttonEnabled: document.getElementById('buttonEnabled'),
+                    buttonListener: document.getElementById('buttonListener')
+                };
+                
+                this.publishBtn = this.elements.publishLinkedInBtn;
+                
+                if (this.publishBtn) {
+                    this.log('✅ Bouton LinkedIn trouvé avec ID: ' + this.publishBtn.id, 'success');
+                } else {
+                    this.log('❌ Bouton LinkedIn NON trouvé', 'error');
+                }
+            }
+            
+            setupEventListeners() {
+                this.log('🔗 Configuration des event listeners...', 'info');
+                
+                if (this.publishBtn) {
+                    this.publishBtn.addEventListener('click', () => {
+                        this.log('🔵 Bouton LinkedIn cliqué !', 'info');
+                        this.simulatePublish();
+                    });
+                    this.log('✅ Event listener ajouté au bouton', 'success');
+                    this.elements.buttonListener.textContent = 'Configuré';
+                    this.elements.buttonListener.className = 'success';
+                } else {
+                    this.log('❌ Impossible d\'ajouter event listener', 'error');
+                    this.elements.buttonListener.textContent = 'Échec';
+                    this.elements.buttonListener.className = 'error';
+                }
+            }
+            
+            checkButtonState() {
+                this.log('🔍 Vérification de l\'état du bouton...', 'info');
+                
+                if (!this.publishBtn) {
+                    this.elements.buttonStatus.textContent = 'Introuvable';
+                    this.elements.buttonStatus.className = 'error';
+                    this.elements.buttonVisible.textContent = 'N/A';
+                    this.elements.buttonEnabled.textContent = 'N/A';
+                    return;
+                }
+                
+                // État général
+                this.elements.buttonStatus.textContent = 'Trouvé';
+                this.elements.buttonStatus.className = 'success';
+                
+                // Visibilité
+                const isVisible = this.publishBtn.style.display !== 'none';
+                this.elements.buttonVisible.textContent = isVisible ? 'Visible' : 'Masqué';
+                this.elements.buttonVisible.className = isVisible ? 'success' : 'warning';
+                
+                // État activé/désactivé
+                const isEnabled = !this.publishBtn.disabled;
+                this.elements.buttonEnabled.textContent = isEnabled ? 'Activé' : 'Désactivé';
+                this.elements.buttonEnabled.className = isEnabled ? 'success' : 'warning';
+                
+                this.log(`📊 État: Visible=${isVisible}, Activé=${isEnabled}`, 'info');
+            }
+            
+            simulatePostGeneration() {
+                this.log('🚀 Simulation de génération de post...', 'info');
+                
+                // Générer un contenu de test
+                const testContent = `🚀 **Test de génération automatique**
+
+Ceci est un post de test généré pour vérifier le fonctionnement du bouton de publication LinkedIn.
+
+📍 **Fonctionnalités testées :**
+• Génération de contenu
+• Affichage du résultat
+• Activation du bouton de publication
+• Event listeners
+
+🎯 **Objectif :** Identifier pourquoi le bouton reste inactif dans l'application principale.
+
+#Test #LinkedIn #Debug #PostSocial`;
+                
+                // Afficher le contenu
+                this.elements.postContent.innerHTML = testContent.replace(/\n/g, '<br>');
+                this.elements.postResult.classList.add('show');
+                
+                // Simuler la logique d'activation du bouton
+                this.updateActionButtonsState(true);
+                
+                this.log('✅ Post de test généré et affiché', 'success');
+            }
+            
+            updateActionButtonsState(hasContent) {
+                this.log(`🔄 updateActionButtonsState: ${hasContent}`, 'info');
+                
+                if (this.publishBtn) {
+                    this.log('🔵 Bouton LinkedIn trouvé, mise à jour...', 'info');
+                    
+                    this.publishBtn.disabled = !hasContent;
+                    this.publishBtn.classList.toggle('disabled', !hasContent);
+                    
+                    if (hasContent) {
+                        this.publishBtn.style.display = 'inline-flex';
+                        this.log('🔵 Bouton LinkedIn affiché et activé', 'success');
+                    } else {
+                        this.publishBtn.style.display = 'none';
+                        this.log('🔵 Bouton LinkedIn masqué', 'warning');
+                    }
+                } else {
+                    this.log('❌ Bouton LinkedIn non trouvé dans updateActionButtonsState', 'error');
+                }
+                
+                this.checkButtonState();
+            }
+            
+            showButton() {
+                this.log('👁️ Forçage de l\'affichage du bouton...', 'info');
+                
+                if (this.publishBtn) {
+                    this.publishBtn.style.display = 'inline-flex';
+                    this.log('✅ Bouton forcé en mode visible', 'success');
+                } else {
+                    this.log('❌ Impossible de forcer l\'affichage', 'error');
+                }
+                
+                this.checkButtonState();
+            }
+            
+            enableButton() {
+                this.log('✅ Activation forcée du bouton...', 'info');
+                
+                if (this.publishBtn) {
+                    this.publishBtn.disabled = false;
+                    this.publishBtn.classList.remove('disabled');
+                    this.log('✅ Bouton forcé en mode activé', 'success');
+                } else {
+                    this.log('❌ Impossible d\'activer le bouton', 'error');
+                }
+                
+                this.checkButtonState();
+            }
+            
+            testClick() {
+                this.log('🔗 Test de clic sur le bouton...', 'info');
+                
+                if (this.publishBtn) {
+                    if (this.publishBtn.style.display === 'none') {
+                        this.log('⚠️ Bouton masqué, impossible de tester le clic', 'warning');
+                        return;
+                    }
+                    
+                    if (this.publishBtn.disabled) {
+                        this.log('⚠️ Bouton désactivé, impossible de tester le clic', 'warning');
+                        return;
+                    }
+                    
+                    this.publishBtn.click();
+                    this.log('✅ Clic simulé sur le bouton', 'success');
+                } else {
+                    this.log('❌ Impossible de tester le clic', 'error');
+                }
+            }
+            
+            simulatePublish() {
+                this.log('📤 Simulation de publication LinkedIn...', 'info');
+                this.log('🔒 Vérification du profil LinkedIn...', 'info');
+                this.log('🚀 Envoi vers LinkedIn (simulation)...', 'info');
+                
+                setTimeout(() => {
+                    this.log('✅ Publication simulée avec succès !', 'success');
+                }, 1000);
+            }
+            
+            log(message, type = 'info') {
+                const timestamp = new Date().toLocaleTimeString();
+                const entry = document.createElement('div');
+                entry.className = `log-entry ${type}`;
+                entry.textContent = `[${timestamp}] ${message}`;
+                
+                this.logContainer.appendChild(entry);
+                this.logContainer.scrollTop = this.logContainer.scrollHeight;
+                
+                console.log(`[${type.toUpperCase()}] ${message}`);
+            }
+            
+            clearLogs() {
+                this.logContainer.innerHTML = '<div class="log-entry info">[INFO] Logs vidés</div>';
+                this.log('🗑️ Logs vidés par l\'utilisateur', 'info');
+            }
+        }
+        
+        // Fonctions globales pour les boutons
+        let tester;
+        
+        function simulatePostGeneration() {
+            tester.simulatePostGeneration();
+        }
+        
+        function showButton() {
+            tester.showButton();
+        }
+        
+        function enableButton() {
+            tester.enableButton();
+        }
+        
+        function testClick() {
+            tester.testClick();
+        }
+        
+        function clearLogs() {
+            tester.clearLogs();
+        }
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            tester = new LinkedInButtonTester();
+        });
+    </script>
+</body>
+</html>
+

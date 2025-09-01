@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Timeout Ollama 300 secondes</title>
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .success-box {
+            background: #d4edda;
+            border: 1px solid #27ae60;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .success-box h2 {
+            color: #27ae60;
+            margin-bottom: 15px;
+        }
+        
+        .info-section {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .info-section h3 {
+            color: #2196f3;
+            margin-top: 0;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .comparison-table th {
+            background: #0077b5;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .comparison-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e1e8ed;
+        }
+        
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .before {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+        
+        .after {
+            color: #27ae60;
+            font-weight: 600;
+        }
+        
+        .test-btn {
+            background: #0077b5;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+        
+        .test-btn:hover {
+            background: #005885;
+            transform: translateY(-1px);
+        }
+        
+        .timer {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .timer.running {
+            background: #f39c12;
+            color: white;
+            animation: pulse 1s infinite;
+        }
+        
+        .timer.success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .timer.timeout {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        .logs {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin: 20px 0;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e1e8ed;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0077b5, #00a0dc);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⏱️ Test - Timeout Ollama 300 secondes</h1>
+        
+        <div class="success-box">
+            <h2>✅ Timeout Ollama Augmenté</h2>
+            <p>Le timeout pour les requêtes Ollama a été porté de <strong>2 minutes</strong> à <strong>5 minutes (300 secondes)</strong></p>
+        </div>
+        
+        <div class="info-section">
+            <h3>📊 Comparaison des Timeouts</h3>
+            
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Configuration</th>
+                        <th>Avant</th>
+                        <th>Après</th>
+                        <th>Amélioration</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Timeout principal (index.html)</strong></td>
+                        <td class="before">120 000 ms (2 min)</td>
+                        <td class="after">300 000 ms (5 min)</td>
+                        <td>+150% (3 min de plus)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Configuration (config.js)</strong></td>
+                        <td class="before">30 000 ms (30 sec)</td>
+                        <td class="after">300 000 ms (5 min)</td>
+                        <td>+900% (4 min 30 sec de plus)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Message d'erreur</strong></td>
+                        <td class="before">"dépassé (2 minutes)"</td>
+                        <td class="after">"dépassé (5 minutes)"</td>
+                        <td>Cohérence assurée</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="info-section">
+            <h3>🎯 Objectifs de cette Modification</h3>
+            <ul>
+                <li><strong>Réduire les échecs de génération</strong> - Plus de temps pour les modèles LLM</li>
+                <li><strong>Améliorer l'expérience utilisateur</strong> - Moins de messages "génération ollama échoué"</li>
+                <li><strong>Supporter les modèles complexes</strong> - Temps suffisant pour les réponses détaillées</li>
+                <li><strong>Éviter les timeouts prématurés</strong> - Surtout pour les prompts complexes</li>
+            </ul>
+        </div>
+        
+        <div class="info-section">
+            <h3>🧪 Test de Simulation du Timeout</h3>
+            <p>Ce test simule une requête Ollama avec le nouveau timeout de 5 minutes :</p>
+            
+            <div style="text-align: center;">
+                <button class="test-btn" onclick="startTimeoutTest()">
+                    🚀 Démarrer Test de Timeout (5 min)
+                </button>
+                
+                <button class="test-btn" onclick="stopTimeoutTest()">
+                    ⏹️ Arrêter Test
+                </button>
+            </div>
+            
+            <div class="timer" id="timer">
+                Prêt à démarrer le test...
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <h3>📋 Instructions de Test avec l'Application</h3>
+            <ol>
+                <li><strong>Ouvrez l'application principale</strong> (index.html)</li>
+                <li><strong>Générez un post complexe</strong> avec un long prompt</li>
+                <li><strong>Observez le comportement</strong> - plus de temps avant timeout</li>
+                <li><strong>Vérifiez les logs</strong> - nouvelles durées dans la console</li>
+                <li><strong>Testez les messages d'erreur</strong> - maintenant "5 minutes" au lieu de "2 minutes"</li>
+            </ol>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="test-btn" onclick="window.open('index.html', '_blank')">
+                    🚀 Ouvrir l'Application Principale
+                </button>
+            </div>
+        </div>
+        
+        <div class="logs" id="logs">
+            [INFO] Test de timeout Ollama initialisé<br>
+            [INFO] Nouveau timeout configuré : 300 secondes (5 minutes)<br>
+            [INFO] Prêt pour les tests...<br>
+        </div>
+        
+        <div class="info-section">
+            <h3>🔧 Modifications Techniques</h3>
+            
+            <h4>1. Code principal (index.html) :</h4>
+            <pre style="background: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto;"><code>// AVANT
+const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minutes
+
+// APRÈS  
+const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minutes</code></pre>
+            
+            <h4>2. Configuration (config.js) :</h4>
+            <pre style="background: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto;"><code>// AVANT
+timeout: 30000, // 30 secondes
+
+// APRÈS
+timeout: 300000, // 300 secondes (5 minutes)</code></pre>
+            
+            <h4>3. Messages d'erreur :</h4>
+            <pre style="background: #f8f9fa; padding: 15px; border-radius: 5px; overflow-x: auto;"><code>// AVANT
+'Délai d\'attente dépassé (2 minutes)'
+
+// APRÈS
+'Délai d\'attente dépassé (5 minutes)'</code></pre>
+        </div>
+    </div>
+
+    <script>
+        let testInterval;
+        let startTime;
+        let isRunning = false;
+        
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logs = document.getElementById('logs');
+            logs.innerHTML += `[${timestamp}] ${message}<br>`;
+            logs.scrollTop = logs.scrollHeight;
+        }
+        
+        function startTimeoutTest() {
+            if (isRunning) {
+                log('Test déjà en cours...');
+                return;
+            }
+            
+            isRunning = true;
+            startTime = Date.now();
+            const timer = document.getElementById('timer');
+            const progressFill = document.getElementById('progressFill');
+            
+            timer.className = 'timer running';
+            timer.textContent = 'Test en cours... 0 / 300 secondes';
+            
+            log('🚀 DÉBUT du test de timeout (300 secondes)');
+            log('⏱️ Simulation d\'une requête Ollama longue...');
+            
+            testInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const percentage = (elapsed / 300) * 100;
+                
+                timer.textContent = `Test en cours... ${elapsed} / 300 secondes`;
+                progressFill.style.width = percentage + '%';
+                
+                if (elapsed >= 300) {
+                    // Timeout atteint
+                    timer.className = 'timer timeout';
+                    timer.textContent = '⏱️ TIMEOUT atteint ! (300 secondes)';
+                    progressFill.style.width = '100%';
+                    
+                    log('⏰ TIMEOUT atteint après 300 secondes');
+                    log('💡 Dans l\'app réelle, l\'utilisateur verrait maintenant :');
+                    log('   "Délai d\'attente dépassé (5 minutes)"');
+                    
+                    stopTimeoutTest();
+                }
+            }, 1000);
+        }
+        
+        function stopTimeoutTest() {
+            if (!isRunning) return;
+            
+            isRunning = false;
+            clearInterval(testInterval);
+            
+            const timer = document.getElementById('timer');
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            
+            if (elapsed < 300) {
+                timer.className = 'timer success';
+                timer.textContent = `✅ Test arrêté après ${elapsed} secondes`;
+                log(`⏹️ Test arrêté manuellement après ${elapsed} secondes`);
+            }
+            
+            log('🏁 Test terminé');
+        }
+        
+        // Simulation d'une requête Ollama réelle
+        function simulateOllamaRequest() {
+            log('🤖 Simulation d\'une requête Ollama avec nouveau timeout...');
+            
+            const startTime = Date.now();
+            
+            // Simuler une requête qui prend du temps
+            setTimeout(() => {
+                const elapsed = Date.now() - startTime;
+                log(`✅ Requête simulée terminée en ${elapsed}ms`);
+                log(`💚 Succès ! (Ancien timeout : 120s aurait échoué si > 120s)`);
+            }, Math.random() * 10000 + 5000); // Entre 5 et 15 secondes
+        }
+        
+        // Test automatique au chargement
+        document.addEventListener('DOMContentLoaded', () => {
+            log('📋 Page de test chargée');
+            log('✅ Nouveau timeout Ollama : 300 secondes (5 minutes)');
+            log('🎯 Objectif : Réduire les échecs "génération ollama échoué"');
+            
+            setTimeout(() => {
+                log('💡 Conseil : Testez maintenant avec l\'application principale');
+            }, 2000);
+        });
+        
+        // Log des détails techniques
+        setTimeout(() => {
+            log('🔧 Détails techniques :');
+            log('   - index.html: setTimeout(abort, 300000)');
+            log('   - config.js: timeout: 300000');
+            log('   - Messages d\'erreur: mis à jour vers "5 minutes"');
+        }, 3000);
+    </script>
+</body>
+</html>

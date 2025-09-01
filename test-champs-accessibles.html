@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Accessibilité des Champs - PostSocial</title>
+    <link rel="stylesheet" href="design-fixes.css">
+    <style>
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        
+        .test-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #0077b5;
+            box-shadow: 0 0 0 3px rgba(0, 119, 181, 0.1);
+            background: white;
+        }
+        
+        .form-group input:hover,
+        .form-group select:hover,
+        .form-group textarea:hover {
+            border-color: #0077b5;
+            background: white;
+        }
+        
+        .form-group input:disabled,
+        .form-group select:disabled,
+        .form-group textarea:disabled {
+            background: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
+            border-color: #ddd;
+        }
+        
+        .required {
+            color: #e74c3c;
+            font-weight: bold;
+            margin-left: 4px;
+        }
+        
+        .field-help {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border-left: 3px solid #0077b5;
+        }
+        
+        .generate-btn {
+            background: linear-gradient(135deg, #0077b5 0%, #667eea 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .generate-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .generate-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .test-results {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+        
+        .test-results h4 {
+            margin-top: 0;
+            color: #333;
+        }
+        
+        .test-log {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e9ecef;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            border-radius: 4px;
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+        
+        .status-indicator.connected {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+        
+        .status-indicator.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .accessibility-test {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        
+        .accessibility-test h5 {
+            margin: 0 0 10px 0;
+            color: #856404;
+        }
+        
+        .accessibility-test ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .accessibility-test li {
+            margin: 5px 0;
+            color: #856404;
+        }
+        
+        .field-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .field-status.accessible {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .field-status.not-accessible {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .field-status.readonly {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .field-status.disabled {
+            background: #e2e3e5;
+            color: #6c757d;
+        }
+        
+        .test-summary {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        
+        .test-summary h4 {
+            margin: 0 0 10px 0;
+            color: #0c5460;
+        }
+        
+        .test-summary .summary-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+            padding: 5px 0;
+        }
+        
+        .test-summary .summary-item .icon {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        
+        .test-summary .summary-item.success {
+            color: #155724;
+        }
+        
+        .test-summary .summary-item.error {
+            color: #721c24;
+        }
+        
+        .test-summary .summary-item.warning {
+            color: #856404;
+        }
+        
+        .interactive-demo {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .interactive-demo h4 {
+            margin-top: 0;
+            color: #495057;
+        }
+        
+        .demo-instructions {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .demo-instructions ol {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .demo-instructions li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Test d'Accessibilité des Champs - PostSocial</h1>
+        <p><strong>Objectif :</strong> Vérifier que tous les champs du bloc "Générateur de posts LinkedIn" sont accessibles et modifiables AVANT d'appuyer sur le bouton "Générer le post".</p>
+        
+        <div class="test-section">
+            <h3>📝 Bloc "Générateur de posts LinkedIn" - Test d'Accessibilité</h3>
+            <p>Ce test vérifie que tous les champs sont accessibles et modifiables avant la génération du post.</p>
+            
+            <div class="accessibility-test">
+                <h5>🎯 Objectifs du Test :</h5>
+                <ul>
+                    <li>✅ Vérifier que tous les champs sont visibles et accessibles</li>
+                    <li>✅ Vérifier que tous les champs sont modifiables (sauf résultat)</li>
+                    <li>✅ Vérifier que les labels et aides sont présents</li>
+                    <li>✅ Vérifier que la navigation clavier fonctionne</li>
+                    <li>✅ Vérifier que les états disabled/readonly sont corrects</li>
+                    <li>✅ Vérifier que les champs sont accessibles AVANT la génération</li>
+                </ul>
+            </div>
+            
+            <form id="testForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="subject" id="subjectLabel">
+                            Sujet du post <span class="required">*</span>
+                            <span class="field-status" id="subjectStatus">Test en cours...</span>
+                        </label>
+                        <textarea id="subject" name="subject" rows="3" required 
+                                  placeholder="Décrivez le sujet de votre post LinkedIn en quelques lignes..."
+                                  aria-describedby="subject-help"></textarea>
+                        <div id="subject-help" class="field-help">
+                            Par exemple : votre expertise, une réflexion professionnelle, une actualité de votre secteur, etc.
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="audience" id="audienceLabel">
+                            Audience cible <span class="required">*</span>
+                            <span class="field-status" id="audienceStatus">Test en cours...</span>
+                        </label>
+                        <select id="audience" name="audience" required>
+                            <option value="">Choisir une audience...</option>
+                            <option value="professionals">Professionnels expérimentés</option>
+                            <option value="juniors">Jeunes professionnels</option>
+                            <option value="entrepreneurs">Entrepreneurs</option>
+                            <option value="managers">Managers et dirigeants</option>
+                            <option value="students">Étudiants</option>
+                            <option value="recruiters">Recruteurs RH</option>
+                        </select>
+                        <div id="audience-help" class="field-help">
+                            Sélectionnez le type de professionnels que vous souhaitez cibler avec votre post
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tone" id="toneLabel">
+                            Ton du message <span class="required">*</span>
+                            <span class="field-status" id="toneStatus">Test en cours...</span>
+                        </label>
+                        <select id="tone" name="tone" required>
+                            <option value="">Choisir un ton...</option>
+                            <option value="professional">Professionnel</option>
+                            <option value="inspirational">Inspirant</option>
+                            <option value="casual">Décontracté</option>
+                            <option value="educational">Éducatif</option>
+                            <option value="motivational">Motivant</option>
+                            <option value="thoughtful">Réfléchi</option>
+                        </select>
+                        <div id="tone-help" class="field-help">
+                            Définissez l'ambiance et le style de votre message LinkedIn
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="postLanguage" id="postLanguageLabel">
+                            Langue du post <span class="required">*</span>
+                            <span class="field-status" id="postLanguageStatus">Test en cours...</span>
+                        </label>
+                        <select id="postLanguage" name="postLanguage" required>
+                            <option value="fr">Français</option>
+                            <option value="en">English</option>
+                        </select>
+                        <div id="language-help" class="field-help">
+                            Choisissez la langue dans laquelle votre post sera généré
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="ollamaModel" id="ollamaModelLabel">
+                            Modèle IA <span class="required">*</span>
+                            <span class="field-status" id="ollamaModelStatus">Test en cours...</span>
+                        </label>
+                        <select id="ollamaModel" name="ollamaModel" required>
+                            <option value="">Choisir un modèle...</option>
+                            <option value="llama3.2:3b">Llama 3.2 3B</option>
+                            <option value="llama3.2:8b">Llama 3.2 8B</option>
+                            <option value="llama3.2:70b">Llama 3.2 70B</option>
+                            <option value="mistral:7b">Mistral 7B</option>
+                            <option value="mistral:11b">Mistral 11B</option>
+                        </select>
+                        <div id="model-help" class="field-help">
+                            Sélectionnez le modèle d'intelligence artificielle qui générera votre post
+                        </div>
+                        <div class="model-info" id="modelInfo" style="display: none;">
+                            <small class="text-muted">
+                                <span id="modelDescription"></span>
+                                <span id="modelSize"></span>
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ollamaStatus" id="ollamaStatusLabel">
+                            Statut du serveur
+                            <span class="field-status" id="ollamaStatusStatus">Test en cours...</span>
+                        </label>
+                        <div class="ollama-status-display" id="ollamaStatusDisplay">
+                            <div class="status-indicator" id="ollamaStatusIndicator">
+                                <svg class="icon" viewBox="0 0 24 24" width="16" height="16">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span>Serveur connecté</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="generate-btn" id="generateBtn">
+                    <svg class="icon" viewBox="0 0 24 24" width="20" height="20" style="margin-right: 8px;">
+                        <path d="M12 2A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2zm0 18a8 8 0 0 1-8-8 8 8 0 0 1 8-8 8 8 0 0 1 8 8 8 8 0 0 1-8 8z"/>
+                        <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" fill="none"/>
+                    </svg>
+                    <span>Générer mon post LinkedIn</span>
+                </button>
+                <div id="generate-help" class="field-help">
+                    Cliquez pour générer votre post LinkedIn avec l'intelligence artificielle
+                </div>
+            </form>
+
+            <!-- Résultat (lecture seule) -->
+            <div class="post-result" id="postResult" style="display: none; margin-top: 20px;">
+                <h3>Votre post LinkedIn :</h3>
+                <div class="post-content" id="postContent" 
+                     role="textbox" 
+                     aria-readonly="true" 
+                     style="background: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #e9ecef; min-height: 100px;">
+                    Aucun post généré pour le moment...
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>📊 Résultats des Tests d'Accessibilité</h3>
+            
+            <div class="test-summary" id="testSummary">
+                <h4>🎯 Résumé des Tests</h4>
+                <div class="summary-item">
+                    <span class="icon">⏳</span>
+                    <span>Tests en cours de préparation...</span>
+                </div>
+            </div>
+            
+            <div class="test-results">
+                <h4>✅ Test des Champs Modifiables</h4>
+                <div id="fieldAccessibilityResults">Tests en cours...</div>
+            </div>
+            
+            <div class="test-results">
+                <h4>🔍 Test de Navigation Clavier</h4>
+                <div id="keyboardNavigationResults">Tests en cours...</div>
+            </div>
+            
+            <div class="test-results">
+                <h4>✏️ Test de Modification des Valeurs</h4>
+                <div id="valueModificationResults">Tests en cours...</div>
+            </div>
+            
+            <div class="test-results">
+                <h4>📋 Logs de Test</h4>
+                <div class="test-log" id="testLogs">Logs de test d'accessibilité...</div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🎮 Démonstration Interactive</h3>
+            
+            <div class="interactive-demo">
+                <h4>🧪 Test Manuel des Champs</h4>
+                <div class="demo-instructions">
+                    <p><strong>Instructions pour tester manuellement l'accessibilité :</strong></p>
+                    <ol>
+                        <li><strong>Navigation clavier :</strong> Utilisez Tab/Shift+Tab pour naviguer entre les champs</li>
+                        <li><strong>Modification des valeurs :</strong> Essayez de saisir du texte et de changer les sélections</li>
+                        <li><strong>Focus visible :</strong> Vérifiez que le focus est bien visible sur chaque champ</li>
+                        <li><strong>Labels et aides :</strong> Vérifiez que les labels et textes d'aide sont présents</li>
+                        <li><strong>États des champs :</strong> Vérifiez qu'aucun champ n'est désactivé ou en lecture seule</li>
+                    </ol>
+                </div>
+                
+                <div class="demo-instructions">
+                    <p><strong>Tests spécifiques à effectuer :</strong></p>
+                    <ol>
+                        <li><strong>Champ Sujet :</strong> Saisissez du texte dans la zone de texte</li>
+                        <li><strong>Champ Audience :</strong> Ouvrez le menu déroulant et sélectionnez une option</li>
+                        <li><strong>Champ Ton :</strong> Changez la sélection du ton</li>
+                        <li><strong>Champ Langue :</strong> Basculez entre Français et English</li>
+                        <li><strong>Champ Modèle IA :</strong> Sélectionnez différents modèles</li>
+                        <li><strong>Bouton Générer :</strong> Vérifiez qu'il est cliquable</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        class FieldAccessibilityTester {
+            constructor() {
+                this.form = document.getElementById('testForm');
+                this.testLogs = document.getElementById('testLogs');
+                this.fieldAccessibilityResults = document.getElementById('fieldAccessibilityResults');
+                this.keyboardNavigationResults = document.getElementById('keyboardNavigationResults');
+                this.valueModificationResults = document.getElementById('valueModificationResults');
+                this.testSummary = document.getElementById('testSummary');
+                
+                this.fields = {
+                    subject: document.getElementById('subject'),
+                    audience: document.getElementById('audience'),
+                    tone: document.getElementById('tone'),
+                    postLanguage: document.getElementById('postLanguage'),
+                    ollamaModel: document.getElementById('ollamaModel'),
+                    ollamaStatus: document.getElementById('ollamaStatusDisplay')
+                };
+                
+                this.init();
+            }
+            
+            init() {
+                this.log('🧪 Initialisation du testeur d\'accessibilité des champs...');
+                this.log('🎯 Objectif : Vérifier que tous les champs sont accessibles AVANT la génération');
+                this.runAccessibilityTests();
+                this.setupEventListeners();
+                this.log('✅ Testeur d\'accessibilité initialisé');
+            }
+            
+            setupEventListeners() {
+                // Test de modification des valeurs
+                Object.values(this.fields).forEach(field => {
+                    if (field && field.tagName !== 'DIV') {
+                        field.addEventListener('input', () => this.testValueModification(field));
+                        field.addEventListener('change', () => this.testValueModification(field));
+                        field.addEventListener('focus', () => this.log(`🔍 Focus sur ${field.name || field.id}`));
+                        field.addEventListener('blur', () => this.log(`🔍 Perte de focus sur ${field.name || field.id}`));
+                    }
+                });
+                
+                // Test de navigation clavier
+                this.form.addEventListener('keydown', (e) => this.testKeyboardNavigation(e));
+                
+                // Test de soumission
+                this.form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.testFormSubmission();
+                });
+            }
+            
+            async runAccessibilityTests() {
+                this.log('🚀 Démarrage des tests d\'accessibilité des champs...');
+                this.log('📋 Vérification que tous les champs sont accessibles AVANT la génération');
+                
+                // Test 1: Accessibilité des champs
+                await this.testFieldAccessibility();
+                
+                // Test 2: Navigation clavier
+                await this.testKeyboardNavigationComprehensive();
+                
+                // Test 3: Modification des valeurs
+                await this.testValueModificationComprehensive();
+                
+                // Test 4: Mise à jour du résumé
+                this.updateTestSummary();
+                
+                this.log('✅ Tous les tests d\'accessibilité terminés');
+            }
+            
+            async testFieldAccessibility() {
+                this.log('🔍 Test de l\'accessibilité des champs...');
+                
+                const results = [];
+                let accessibleCount = 0;
+                let totalCount = 0;
+                
+                Object.entries(this.fields).forEach(([fieldName, field]) => {
+                    if (!field) {
+                        results.push(`❌ Champ ${fieldName} non trouvé`);
+                        return;
+                    }
+                    
+                    totalCount++;
+                    const status = this.getFieldStatus(field);
+                    const isAccessible = this.isFieldAccessible(field);
+                    
+                    if (isAccessible) accessibleCount++;
+                    
+                    // Mettre à jour le statut visuel
+                    const statusElement = document.getElementById(`${fieldName}Status`);
+                    if (statusElement) {
+                        statusElement.className = `field-status ${isAccessible ? 'accessible' : 'not-accessible'}`;
+                        statusElement.textContent = isAccessible ? 'Accessible' : 'Non accessible';
+                    }
+                    
+                    results.push(`${isAccessible ? '✅' : '❌'} ${fieldName}: ${status}`);
+                });
+                
+                this.fieldAccessibilityResults.innerHTML = `
+                    <div style="color: #27ae60; font-weight: bold;">Test d'accessibilité des champs terminé</div>
+                    <div style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 4px;">
+                        <strong>Résultat :</strong> ${accessibleCount}/${totalCount} champs accessibles
+                    </div>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        ${results.map(result => `<li>${result}</li>`).join('')}
+                    </ul>
+                `;
+                
+                this.log(`✅ Test d'accessibilité des champs terminé : ${accessibleCount}/${totalCount} champs accessibles`);
+            }
+            
+            getFieldStatus(field) {
+                if (field.disabled) return 'Désactivé';
+                if (field.readOnly) return 'Lecture seule';
+                if (field.tagName === 'DIV') return 'Affichage seulement';
+                return 'Modifiable';
+            }
+            
+            isFieldAccessible(field) {
+                if (field.tagName === 'DIV') return true; // Affichage seulement
+                if (field.disabled) return false;
+                if (field.readOnly) return false;
+                if (field.style.display === 'none') return false;
+                if (field.style.visibility === 'hidden') return false;
+                return true;
+            }
+            
+            async testKeyboardNavigationComprehensive() {
+                this.log('⌨️ Test de navigation clavier...');
+                
+                const tabbableElements = this.getTabbableElements();
+                this.log(`📱 Éléments navigables par Tab: ${tabbableElements.length}`);
+                
+                // Test de focus
+                tabbableElements.forEach((element, index) => {
+                    element.addEventListener('focus', () => {
+                        this.log(`🔍 Focus sur l'élément ${index + 1}: ${element.name || element.id}`);
+                    });
+                });
+                
+                this.keyboardNavigationResults.innerHTML = `
+                    <div style="color: #27ae60; font-weight: bold;">Test de navigation clavier terminé</div>
+                    <div style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 4px;">
+                        <strong>Résultat :</strong> ${tabbableElements.length} éléments navigables par Tab
+                    </div>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        <li>📱 Éléments navigables par Tab: ${tabbableElements.length}</li>
+                        <li>🔍 Test de focus configuré sur tous les éléments</li>
+                        <li>⌨️ Utilisez Tab/Shift+Tab pour naviguer</li>
+                        <li>🔍 Utilisez Entrée/Espace pour activer</li>
+                    </ul>
+                `;
+                
+                this.log('✅ Test de navigation clavier terminé');
+            }
+            
+            getTabbableElements() {
+                const tabbable = [];
+                const elements = this.form.querySelectorAll('input, select, textarea, button');
+                
+                elements.forEach(element => {
+                    if (!element.disabled && element.style.display !== 'none') {
+                        tabbable.push(element);
+                    }
+                });
+                
+                return tabbable;
+            }
+            
+            testKeyboardNavigation(e) {
+                if (e.key === 'Tab') {
+                    this.log(`⌨️ Navigation Tab: ${e.target.name || e.target.id}`);
+                } else if (e.key === 'Enter' && e.target.tagName === 'BUTTON') {
+                    this.log(`⌨️ Activation bouton: ${e.target.textContent}`);
+                }
+            }
+            
+            async testValueModificationComprehensive() {
+                this.log('✏️ Test de modification des valeurs...');
+                
+                const results = [];
+                let modifiableCount = 0;
+                let totalCount = 0;
+                
+                Object.entries(this.fields).forEach(([fieldName, field]) => {
+                    if (!field || field.tagName === 'DIV') return;
+                    
+                    totalCount++;
+                    const canModify = this.canFieldBeModified(field);
+                    const testValue = this.getTestValue(field);
+                    
+                    if (canModify) {
+                        modifiableCount++;
+                        try {
+                            this.setFieldValue(field, testValue);
+                            const currentValue = this.getFieldValue(field);
+                            const success = currentValue === testValue;
+                            
+                            results.push(`${success ? '✅' : '❌'} ${fieldName}: ${success ? 'Modifiable' : 'Erreur de modification'}`);
+                            
+                            // Restaurer la valeur originale
+                            this.restoreFieldValue(field);
+                        } catch (error) {
+                            results.push(`❌ ${fieldName}: Erreur lors du test - ${error.message}`);
+                        }
+                    } else {
+                        results.push(`⚠️ ${fieldName}: Non modifiable (${this.getFieldStatus(field)})`);
+                    }
+                });
+                
+                this.valueModificationResults.innerHTML = `
+                    <div style="color: #27ae60; font-weight: bold;">Test de modification des valeurs terminé</div>
+                    <div style="margin: 10px 0; padding: 10px; background: #e8f5e8; border-radius: 4px;">
+                        <strong>Résultat :</strong> ${modifiableCount}/${totalCount} champs modifiables
+                    </div>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        ${results.map(result => `<li>${result}</li>`).join('')}
+                    </ul>
+                `;
+                
+                this.log(`✅ Test de modification des valeurs terminé : ${modifiableCount}/${totalCount} champs modifiables`);
+            }
+            
+            canFieldBeModified(field) {
+                return !field.disabled && !field.readOnly && field.style.display !== 'none';
+            }
+            
+            getTestValue(field) {
+                if (field.tagName === 'TEXTAREA') return 'Test de modification - Sujet de post LinkedIn';
+                if (field.tagName === 'SELECT') {
+                    const options = Array.from(field.options).filter(opt => opt.value);
+                    return options.length > 0 ? options[0].value : '';
+                }
+                return 'Test';
+            }
+            
+            setFieldValue(field, value) {
+                if (field.tagName === 'TEXTAREA' || field.tagName === 'INPUT') {
+                    field.value = value;
+                    field.dispatchEvent(new Event('input', { bubbles: true }));
+                } else if (field.tagName === 'SELECT') {
+                    field.value = value;
+                    field.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }
+            
+            getFieldValue(field) {
+                return field.value;
+            }
+            
+            restoreFieldValue(field) {
+                if (field.tagName === 'TEXTAREA' || field.tagName === 'INPUT') {
+                    field.value = '';
+                } else if (field.tagName === 'SELECT') {
+                    field.selectedIndex = 0;
+                }
+            }
+            
+            testValueModification(field) {
+                this.log(`✏️ Modification détectée sur ${field.name || field.id}: "${field.value}"`);
+            }
+            
+            async testFormSubmission() {
+                this.log('📤 Test de soumission du formulaire...');
+                
+                const formData = new FormData(this.form);
+                const data = {};
+                
+                for (let [key, value] of formData.entries()) {
+                    data[key] = value;
+                }
+                
+                this.log(`📝 Données du formulaire: ${JSON.stringify(data, null, 2)}`);
+                
+                // Simuler la génération
+                this.postResult.style.display = 'block';
+                this.postContent.innerHTML = `
+                    <strong>Test de soumission réussi !</strong><br><br>
+                    <strong>Sujet:</strong> ${data.subject || 'Non renseigné'}<br>
+                    <strong>Audience:</strong> ${data.audience || 'Non renseigné'}<br>
+                    <strong>Ton:</strong> ${data.tone || 'Non renseigné'}<br>
+                    <strong>Langue:</strong> ${data.postLanguage || 'Non renseigné'}<br>
+                    <strong>Modèle:</strong> ${data.ollamaModel || 'Non renseigné'}<br><br>
+                    <em>Ceci est un test d'accessibilité - aucun post réel n'a été généré.</em>
+                `;
+                
+                this.log('✅ Test de soumission du formulaire terminé');
+            }
+            
+            updateTestSummary() {
+                const accessibleFields = Object.values(this.fields).filter(field => 
+                    field && this.isFieldAccessible(field)
+                ).length;
+                
+                const totalFields = Object.keys(this.fields).length;
+                
+                let summaryHTML = `
+                    <h4>🎯 Résumé des Tests d'Accessibilité</h4>
+                    <div class="summary-item success">
+                        <span class="icon">✅</span>
+                        <span><strong>Champs accessibles :</strong> ${accessibleFields}/${totalFields}</span>
+                    </div>
+                `;
+                
+                if (accessibleFields === totalFields) {
+                    summaryHTML += `
+                        <div class="summary-item success">
+                            <span class="icon">🎉</span>
+                            <span><strong>Statut :</strong> Tous les champs sont accessibles et modifiables !</span>
+                        </div>
+                        <div class="summary-item success">
+                            <span class="icon">🚀</span>
+                            <span><strong>Prêt pour la génération :</strong> Vous pouvez maintenant utiliser le bouton "Générer le post"</span>
+                        </div>
+                    `;
+                } else {
+                    summaryHTML += `
+                        <div class="summary-item error">
+                            <span class="icon">⚠️</span>
+                            <span><strong>Attention :</strong> Certains champs ne sont pas accessibles</span>
+                        </div>
+                    `;
+                }
+                
+                this.testSummary.innerHTML = summaryHTML;
+            }
+            
+            log(message) {
+                const timestamp = new Date().toLocaleTimeString();
+                this.testLogs.innerHTML += `[${timestamp}] ${message}\n`;
+                this.testLogs.scrollTop = this.testLogs.scrollHeight;
+                console.log(message);
+            }
+        }
+        
+        // Initialisation du testeur
+        document.addEventListener('DOMContentLoaded', () => {
+            new FieldAccessibilityTester();
+        });
+    </script>
+</body>
+</html>

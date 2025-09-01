@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Gestion État Authentification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: 8px;
+        }
+        .status-connected { background: #28a745; }
+        .status-disconnected { background: #dc3545; }
+        .status-checking { background: #ffc107; }
+        .log-entry {
+            background: #f8f9fa;
+            padding: 5px;
+            margin: 2px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        .log-error { border-left: 3px solid #dc3545; }
+        .log-success { border-left: 3px solid #28a745; }
+        .log-info { border-left: 3px solid #17a2b8; }
+        .log-warning { border-left: 3px solid #ffc107; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Gestion État Authentification</h1>
+    
+    <div class="test-section">
+        <h2>1. État Actuel de l'Application</h2>
+        <div id="currentState">
+            <p><strong>État de l'authentification :</strong> <span id="authState">Vérification...</span></p>
+            <p><strong>Utilisateur connecté :</strong> <span id="userStatus">Vérification...</span></p>
+            <p><strong>Page affichée :</strong> <span id="currentPage">Vérification...</span></p>
+            <p><strong>Container Auth :</strong> <span id="authContainerStatus">Vérification...</span></p>
+            <p><strong>Dashboard :</strong> <span id="dashboardStatus">Vérification...</span></p>
+        </div>
+        <button onclick="checkCurrentState()">🔄 Vérifier l'état actuel</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Test des Méthodes de Navigation</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div>
+                <h3>Authentification</h3>
+                <button onclick="testShowLogin()">🔐 Afficher Login</button>
+                <button onclick="testShowSignup()">📝 Afficher Signup</button>
+                <button onclick="testShowDashboard()">🏠 Afficher Dashboard</button>
+            </div>
+            <div>
+                <h3>Actions</h3>
+                <button onclick="testLogout()">🚪 Simuler Déconnexion</button>
+                <button onclick="testCheckAuth()">🔍 Vérifier Auth</button>
+                <button onclick="testResetState()">🔄 Réinitialiser</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Test des Éléments DOM</h2>
+        <div id="domTestResults">
+            <p>Cliquez sur "Tester les éléments DOM" pour vérifier la présence des éléments</p>
+        </div>
+        <button onclick="testDOMElements()">🔍 Tester les éléments DOM</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Simulation d'Authentification</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div>
+                <h3>Connexion</h3>
+                <input type="email" id="testEmail" placeholder="test@example.com" style="width: 100%; margin: 5px 0;">
+                <input type="password" id="testPassword" placeholder="Mot de passe" style="width: 100%; margin: 5px 0;">
+                <button onclick="simulateLogin()">🔐 Simuler Connexion</button>
+            </div>
+            <div>
+                <h3>Inscription</h3>
+                <input type="text" id="testName" placeholder="Nom complet" style="width: 100%; margin: 5px 0;">
+                <button onclick="simulateSignup()">📝 Simuler Inscription</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>5. Logs de Test</h2>
+        <div id="testLogs" style="background: #f8f9fa; padding: 10px; border-radius: 4px; max-height: 400px; overflow-y: auto;"></div>
+        <button onclick="clearLogs()">🗑️ Effacer les logs</button>
+    </div>
+
+    <script>
+        // Variables globales pour les tests
+        let testApp = null;
+        let testUser = null;
+        
+        // Fonction utilitaire pour logger les tests
+        function logTest(message, type = 'info') {
+            const logs = document.getElementById('testLogs');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logs.appendChild(logEntry);
+            logs.scrollTop = logs.scrollHeight;
+            console.log(`[TEST] ${message}`);
+        }
+        
+        // Fonction utilitaire pour afficher les résultats
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.innerHTML = `<div class="test-result ${type}">${message}</div>`;
+            }
+        }
+        
+        // Vérifier l'état actuel
+        function checkCurrentState() {
+            logTest('Vérification de l\'état actuel...');
+            
+            try {
+                // Vérifier l'état de l'authentification
+                const authContainer = document.querySelector('.auth-container');
+                const dashboard = document.querySelector('.dashboard');
+                const loginPage = document.querySelector('#loginPage');
+                const signupPage = document.querySelector('#signupPage');
+                
+                // État de l'authentification
+                const authState = authContainer && authContainer.style.display !== 'none' ? 'Visible' : 'Masqué';
+                document.getElementById('authState').textContent = authState;
+                
+                // État de l'utilisateur
+                const userStatus = testUser ? `Connecté (${testUser.email})` : 'Non connecté';
+                document.getElementById('userStatus').textContent = userStatus;
+                
+                // Page actuelle
+                let currentPage = 'Inconnue';
+                if (dashboard && dashboard.style.display !== 'none') {
+                    currentPage = 'Dashboard';
+                } else if (loginPage && loginPage.style.display !== 'none') {
+                    currentPage = 'Login';
+                } else if (signupPage && signupPage.style.display !== 'none') {
+                    currentPage = 'Signup';
+                }
+                document.getElementById('currentPage').textContent = currentPage;
+                
+                // Statut du container d'authentification
+                const authContainerStatus = authContainer ? 
+                    (authContainer.style.display !== 'none' ? 'Visible' : 'Masqué') : 'Non trouvé';
+                document.getElementById('authContainerStatus').textContent = authContainerStatus;
+                
+                // Statut du dashboard
+                const dashboardStatus = dashboard ? 
+                    (dashboard.style.display !== 'none' ? 'Visible' : 'Masqué') : 'Non trouvé';
+                document.getElementById('dashboardStatus').textContent = dashboardStatus;
+                
+                logTest('État vérifié avec succès', 'success');
+                
+            } catch (error) {
+                logTest(`Erreur lors de la vérification: ${error.message}`, 'error');
+            }
+        }
+        
+        // Test d'affichage de la page de connexion
+        function testShowLogin() {
+            logTest('Test d\'affichage de la page de connexion...');
+            
+            try {
+                // Masquer le dashboard
+                const dashboard = document.querySelector('.dashboard');
+                if (dashboard) {
+                    dashboard.style.display = 'none';
+                    dashboard.classList.remove('active');
+                }
+                
+                // Afficher le container d'authentification
+                const authContainer = document.querySelector('.auth-container');
+                if (authContainer) {
+                    authContainer.style.display = 'flex';
+                }
+                
+                // Masquer toutes les pages d'authentification
+                document.querySelectorAll('.auth-page').forEach(page => {
+                    page.style.display = 'none';
+                    page.classList.remove('active', 'fade-out');
+                });
+                
+                // Afficher la page de connexion
+                const loginPage = document.querySelector('#loginPage');
+                if (loginPage) {
+                    loginPage.style.display = 'block';
+                    loginPage.classList.add('active');
+                    logTest('Page de connexion affichée', 'success');
+                } else {
+                    logTest('Page de connexion non trouvée', 'error');
+                }
+                
+                checkCurrentState();
+                
+            } catch (error) {
+                logTest(`Erreur lors du test: ${error.message}`, 'error');
+            }
+        }
+        
+        // Test d'affichage de la page d'inscription
+        function testShowSignup() {
+            logTest('Test d\'affichage de la page d\'inscription...');
+            
+            try {
+                // Masquer le dashboard
+                const dashboard = document.querySelector('.dashboard');
+                if (dashboard) {
+                    dashboard.style.display = 'none';
+                    dashboard.classList.remove('active');
+                }
+                
+                // Afficher le container d'authentification
+                const authContainer = document.querySelector('.auth-container');
+                if (authContainer) {
+                    authContainer.style.display = 'flex';
+                }
+                
+                // Masquer toutes les pages d'authentification
+                document.querySelectorAll('.auth-page').forEach(page => {
+                    page.style.display = 'none';
+                    page.classList.remove('active', 'fade-out');
+                });
+                
+                // Afficher la page d'inscription
+                const signupPage = document.querySelector('#signupPage');
+                if (signupPage) {
+                    signupPage.style.display = 'block';
+                    signupPage.classList.add('active');
+                    logTest('Page d\'inscription affichée', 'success');
+                } else {
+                    logTest('Page d\'inscription non trouvée', 'error');
+                }
+                
+                checkCurrentState();
+                
+            } catch (error) {
+                logTest(`Erreur lors du test: ${error.message}`, 'error');
+            }
+        }
+        
+        // Test d'affichage du dashboard
+        function testShowDashboard() {
+            logTest('Test d\'affichage du dashboard...');
+            
+            try {
+                // Masquer le container d'authentification
+                const authContainer = document.querySelector('.auth-container');
+                if (authContainer) {
+                    authContainer.style.display = 'none';
+                }
+                
+                // Masquer toutes les pages d'authentification
+                document.querySelectorAll('.auth-page').forEach(page => {
+                    page.style.display = 'none';
+                    page.classList.remove('active', 'fade-out');
+                });
+                
+                // Afficher le dashboard
+                const dashboard = document.querySelector('.dashboard');
+                if (dashboard) {
+                    dashboard.style.display = 'block';
+                    dashboard.classList.add('active');
+                    logTest('Dashboard affiché', 'success');
+                } else {
+                    logTest('Dashboard non trouvé', 'error');
+                }
+                
+                checkCurrentState();
+                
+            } catch (error) {
+                logTest(`Erreur lors du test: ${error.message}`, 'error');
+            }
+        }
+        
+        // Test de déconnexion
+        function testLogout() {
+            logTest('Test de déconnexion...');
+            
+            try {
+                // Réinitialiser l'utilisateur
+                testUser = null;
+                
+                // Afficher la page de connexion
+                testShowLogin();
+                
+                logTest('Déconnexion simulée avec succès', 'success');
+                
+            } catch (error) {
+                logTest(`Erreur lors du test: ${error.message}`, 'error');
+            }
+        }
+        
+        // Test de vérification d'authentification
+        function testCheckAuth() {
+            logTest('Test de vérification d\'authentification...');
+            
+            try {
+                if (testUser) {
+                    logTest('Utilisateur connecté, affichage du dashboard', 'info');
+                    testShowDashboard();
+                } else {
+                    logTest('Aucun utilisateur connecté, affichage de la page de connexion', 'info');
+                    testShowLogin();
+                }
+                
+            } catch (error) {
+                logTest(`Erreur lors du test: ${error.message}`, 'error');
+            }
+        }
+        
+        // Test de réinitialisation
+        function testResetState() {
+            logTest('Réinitialisation de l\'état...');
+            
+            try {
+                // Réinitialiser l'utilisateur
+                testUser = null;
+                
+                // Afficher la page de connexion par défaut
+                testShowLogin();
+                
+                logTest('État réinitialisé avec succès', 'success');
+                
+            } catch (error) {
+                logTest(`Erreur lors du test: ${error.message}`, 'error');
+            }
+        }
+        
+        // Test des éléments DOM
+        function testDOMElements() {
+            logTest('Test des éléments DOM...');
+            
+            const results = [];
+            
+            try {
+                // Vérifier les éléments principaux
+                const authContainer = document.querySelector('.auth-container');
+                const dashboard = document.querySelector('.dashboard');
+                const loginPage = document.querySelector('#loginPage');
+                const signupPage = document.querySelector('#signupPage');
+                
+                results.push(`Container Auth: ${authContainer ? '✅ Trouvé' : '❌ Non trouvé'}`);
+                results.push(`Dashboard: ${dashboard ? '✅ Trouvé' : '❌ Non trouvé'}`);
+                results.push(`Page Login: ${loginPage ? '✅ Trouvée' : '❌ Non trouvée'}`);
+                results.push(`Page Signup: ${signupPage ? '✅ Trouvée' : '❌ Non trouvée'}`);
+                
+                // Vérifier les formulaires
+                const loginForm = document.querySelector('#loginForm');
+                const signupForm = document.querySelector('#signupForm');
+                
+                results.push(`Formulaire Login: ${loginForm ? '✅ Trouvé' : '❌ Non trouvé'}`);
+                results.push(`Formulaire Signup: ${signupForm ? '✅ Trouvé' : '❌ Non trouvé'}`);
+                
+                // Vérifier les boutons
+                const loginBtn = document.querySelector('#loginBtn');
+                const signupBtn = document.querySelector('#signupBtn');
+                const logoutBtn = document.querySelector('#logoutBtn');
+                
+                results.push(`Bouton Login: ${loginBtn ? '✅ Trouvé' : '❌ Non trouvé'}`);
+                results.push(`Bouton Signup: ${signupBtn ? '✅ Trouvé' : '❌ Non trouvé'}`);
+                results.push(`Bouton Logout: ${logoutBtn ? '✅ Trouvé' : '❌ Non trouvé'}`);
+                
+                // Afficher les résultats
+                const resultsDiv = document.getElementById('domTestResults');
+                resultsDiv.innerHTML = results.map(result => `<p>${result}</p>`).join('');
+                
+                logTest('Test des éléments DOM terminé', 'success');
+                
+            } catch (error) {
+                logTest(`Erreur lors du test: ${error.message}`, 'error');
+            }
+        }
+        
+        // Simulation de connexion
+        function simulateLogin() {
+            logTest('Simulation de connexion...');
+            
+            try {
+                const email = document.getElementById('testEmail').value;
+                const password = document.getElementById('testPassword').value;
+                
+                if (!email || !password) {
+                    logTest('Email et mot de passe requis', 'warning');
+                    return;
+                }
+                
+                // Simuler un utilisateur connecté
+                testUser = { email, id: 'test-user-123' };
+                
+                // Afficher le dashboard
+                testShowDashboard();
+                
+                logTest(`Connexion simulée pour ${email}`, 'success');
+                
+            } catch (error) {
+                logTest(`Erreur lors de la simulation: ${error.message}`, 'error');
+            }
+        }
+        
+        // Simulation d'inscription
+        function simulateSignup() {
+            logTest('Simulation d\'inscription...');
+            
+            try {
+                const name = document.getElementById('testName').value;
+                const email = document.getElementById('testEmail').value;
+                const password = document.getElementById('testPassword').value;
+                
+                if (!name || !email || !password) {
+                    logTest('Nom, email et mot de passe requis', 'warning');
+                    return;
+                }
+                
+                // Simuler un utilisateur inscrit
+                testUser = { email, name, id: 'test-user-456' };
+                
+                // Afficher le dashboard
+                testShowDashboard();
+                
+                logTest(`Inscription simulée pour ${name} (${email})`, 'success');
+                
+            } catch (error) {
+                logTest(`Erreur lors de la simulation: ${error.message}`, 'error');
+            }
+        }
+        
+        // Effacer les logs
+        function clearLogs() {
+            const logs = document.getElementById('testLogs');
+            logs.innerHTML = '';
+            logTest('Logs effacés');
+        }
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            logTest('Page de test chargée');
+            logTest('Tests disponibles:');
+            logTest('1. Vérification de l\'état actuel');
+            logTest('2. Test des méthodes de navigation');
+            logTest('3. Test des éléments DOM');
+            logTest('4. Simulation d\'authentification');
+            logTest('5. Logs de test');
+            
+            // Vérifier l'état initial
+            setTimeout(checkCurrentState, 500);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Génération de Posts - PostSocial</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #34495e;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .field-help {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border-left: 3px solid #007bff;
+        }
+        .required {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .post-result {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        .post-content {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+            min-height: 100px;
+            white-space: pre-wrap;
+        }
+        .action-buttons {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .action-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .action-btn:hover {
+            background: #5a6268;
+        }
+        .action-btn.save {
+            background: #28a745;
+        }
+        .action-btn.save:hover {
+            background: #218838;
+        }
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Génération de Posts LinkedIn</h1>
+        
+        <div class="test-section">
+            <h3>📝 Formulaire de Test</h3>
+            <form id="testPostForm">
+                <div class="form-group">
+                    <label for="testSubject">Sujet du post <span class="required">*</span></label>
+                    <textarea id="testSubject" name="subject" required 
+                             placeholder="Décrivez le sujet de votre post LinkedIn en quelques lignes..."></textarea>
+                    <div class="field-help">
+                        Par exemple : votre expertise, une réflexion professionnelle, une actualité de votre secteur, etc.
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="testAudience">Audience cible <span class="required">*</span></label>
+                    <select id="testAudience" name="audience" required>
+                        <option value="">Choisir une audience...</option>
+                        <option value="professionals">Professionnels expérimentés</option>
+                        <option value="juniors">Jeunes professionnels</option>
+                        <option value="entrepreneurs">Entrepreneurs</option>
+                        <option value="managers">Managers et dirigeants</option>
+                        <option value="students">Étudiants</option>
+                        <option value="recruiters">Recruteurs RH</option>
+                    </select>
+                    <div class="field-help">
+                        Sélectionnez le type de professionnels que vous souhaitez cibler
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="testTone">Ton du message <span class="required">*</span></label>
+                    <select id="testTone" name="tone" required>
+                        <option value="">Choisir un ton...</option>
+                        <option value="professional">Professionnel</option>
+                        <option value="inspirational">Inspirant</option>
+                        <option value="casual">Décontracté</option>
+                        <option value="educational">Éducatif</option>
+                        <option value="motivational">Motivant</option>
+                        <option value="thoughtful">Réfléchi</option>
+                    </select>
+                    <div class="field-help">
+                        Définissez l'ambiance et le style de votre message
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="testLanguage">Langue du post <span class="required">*</span></label>
+                    <select id="testLanguage" name="postLanguage" required>
+                        <option value="fr">Français</option>
+                        <option value="en">English</option>
+                    </select>
+                    <div class="field-help">
+                        Choisissez la langue dans laquelle votre post sera généré
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="testModel">Modèle IA <span class="required">*</span></label>
+                    <select id="testModel" name="ollamaModel" required>
+                        <option value="">Choisir un modèle...</option>
+                        <option value="llama3.2">Llama 3.2</option>
+                        <option value="mistral">Mistral</option>
+                        <option value="codellama">Code Llama</option>
+                        <option value="test">Modèle de Test</option>
+                    </select>
+                    <div class="field-help">
+                        Sélectionnez le modèle d'intelligence artificielle
+                    </div>
+                </div>
+                
+                <button type="submit" id="testGenerateBtn">
+                    <span id="testGenerateBtnText">🧪 Tester la Génération</span>
+                </button>
+            </form>
+        </div>
+        
+        <div class="test-section">
+            <h3>🔍 Diagnostic du Formulaire</h3>
+            <button onclick="diagnoseForm()">🔍 Diagnostiquer le Formulaire</button>
+            <button onclick="testValidation()">✅ Tester la Validation</button>
+            <button onclick="testSubmission()">📤 Tester la Soumission</button>
+            <div id="diagnostic-results"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>📊 Résultats des Tests</h3>
+            <div id="test-results"></div>
+        </div>
+        
+        <div class="post-result" id="testPostResult" style="display: none;">
+            <h3>Votre post LinkedIn généré :</h3>
+            <div class="post-content" id="testPostContent"></div>
+            <div class="action-buttons">
+                <button class="action-btn" onclick="testCopyPost()">📋 Copier</button>
+                <button class="action-btn save" onclick="testSavePost()">💾 Sauvegarder</button>
+                <button class="action-btn" onclick="testPublishPost()">🚀 Publier</button>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h3>📋 Logs de Test</h3>
+            <div id="test-logs"></div>
+        </div>
+    </div>
+
+    <script>
+        class PostGenerationTester {
+            constructor() {
+                this.logs = [];
+                this.originalBtnText = '';
+                this.init();
+            }
+            
+            init() {
+                this.setupEventListeners();
+                this.log('🚀 Testeur de génération de posts initialisé');
+            }
+            
+            setupEventListeners() {
+                const form = document.getElementById('testPostForm');
+                if (form) {
+                    form.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        this.testGeneratePost();
+                    });
+                }
+            }
+            
+            log(message, type = 'info') {
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = `[${timestamp}] ${message}`;
+                this.logs.unshift(logEntry);
+                
+                // Limiter les logs à 50 entrées
+                if (this.logs.length > 50) {
+                    this.logs = this.logs.slice(0, 50);
+                }
+                
+                this.updateLogsDisplay();
+                console.log(logEntry);
+            }
+            
+            updateLogsDisplay() {
+                const logsDiv = document.getElementById('test-logs');
+                if (logsDiv) {
+                    logsDiv.innerHTML = this.logs.map(log => `<div>${log}</div>`).join('');
+                }
+            }
+            
+            diagnoseForm() {
+                this.log('🔍 Début du diagnostic du formulaire...');
+                
+                const results = [];
+                
+                // Vérifier l'existence des éléments
+                const form = document.getElementById('testPostForm');
+                const subject = document.getElementById('testSubject');
+                const audience = document.getElementById('testAudience');
+                const tone = document.getElementById('testTone');
+                const language = document.getElementById('testLanguage');
+                const model = document.getElementById('testModel');
+                const generateBtn = document.getElementById('testGenerateBtn');
+                
+                results.push(`📋 Formulaire: ${form ? '✅ Présent' : '❌ Manquant'}`);
+                results.push(`📝 Sujet: ${subject ? '✅ Présent' : '❌ Manquant'}`);
+                results.push(`👥 Audience: ${audience ? '✅ Présent' : '❌ Manquant'}`);
+                results.push(`🎭 Ton: ${tone ? '✅ Présent' : '❌ Manquant'}`);
+                results.push(`🌐 Langue: ${language ? '✅ Présent' : '❌ Manquant'}`);
+                results.push(`🤖 Modèle: ${model ? '✅ Présent' : '❌ Manquant'}`);
+                results.push(`🚀 Bouton: ${generateBtn ? '✅ Présent' : '❌ Manquant'}`);
+                
+                // Vérifier les attributs required
+                if (subject) results.push(`📝 Sujet required: ${subject.hasAttribute('required') ? '✅ Oui' : '❌ Non'}`);
+                if (audience) results.push(`👥 Audience required: ${audience.hasAttribute('required') ? '✅ Oui' : '❌ Non'}`);
+                if (tone) results.push(`🎭 Ton required: ${tone.hasAttribute('required') ? '✅ Oui' : '❌ Non'}`);
+                if (language) results.push(`🌐 Langue required: ${language.hasAttribute('required') ? '✅ Oui' : '❌ Non'}`);
+                if (model) results.push(`🤖 Modèle required: ${model.hasAttribute('required') ? '✅ Oui' : '❌ Non'}`);
+                
+                // Vérifier les valeurs par défaut
+                if (language) results.push(`🌐 Langue par défaut: ${language.value || '❌ Aucune'}`);
+                
+                this.displayDiagnosticResults(results);
+            }
+            
+            testValidation() {
+                this.log('✅ Test de validation des champs...');
+                
+                const results = [];
+                
+                // Récupérer les valeurs
+                const subject = document.getElementById('testSubject')?.value;
+                const audience = document.getElementById('testAudience')?.value;
+                const tone = document.getElementById('testTone')?.value;
+                const language = document.getElementById('testLanguage')?.value;
+                const model = document.getElementById('testModel')?.value;
+                
+                // Vérifier chaque champ
+                results.push(`📝 Sujet: ${subject ? `✅ "${subject.substring(0, 50)}..."` : '❌ Vide'}`);
+                results.push(`👥 Audience: ${audience ? `✅ "${audience}"` : '❌ Non sélectionnée'}`);
+                results.push(`🎭 Ton: ${tone ? `✅ "${tone}"` : '❌ Non sélectionné'}`);
+                results.push(`🌐 Langue: ${language ? `✅ "${language}"` : '❌ Non sélectionnée'}`);
+                results.push(`🤖 Modèle: ${model ? `✅ "${model}"` : '❌ Non sélectionné'}`);
+                
+                // Vérifier la validité globale
+                const isValid = subject && audience && tone && language && model;
+                results.push(`\n🎯 Formulaire valide: ${isValid ? '✅ OUI' : '❌ NON'}`);
+                
+                if (!isValid) {
+                    results.push('\n❌ Champs manquants:');
+                    if (!subject) results.push('  - Sujet du post');
+                    if (!audience) results.push('  - Audience cible');
+                    if (!tone) results.push('  - Ton du message');
+                    if (!language) results.push('  - Langue du post');
+                    if (!model) results.push('  - Modèle IA');
+                }
+                
+                this.displayDiagnosticResults(results);
+            }
+            
+            testSubmission() {
+                this.log('📤 Test de soumission du formulaire...');
+                
+                const form = document.getElementById('testPostForm');
+                if (!form) {
+                    this.log('❌ Formulaire non trouvé', 'error');
+                    return;
+                }
+                
+                // Simuler la soumission
+                const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+                const wasPrevented = form.dispatchEvent(submitEvent);
+                
+                this.log(`📤 Événement submit: ${wasPrevented ? '✅ Déclenché' : '❌ Bloqué'}`);
+                
+                // Vérifier si le formulaire est valide
+                if (form.checkValidity()) {
+                    this.log('✅ Formulaire valide selon HTML5', 'success');
+                } else {
+                    this.log('❌ Formulaire invalide selon HTML5', 'error');
+                    form.reportValidity();
+                }
+            }
+            
+            async testGeneratePost() {
+                this.log('🚀 Test de génération de post...');
+                
+                // Récupérer les valeurs du formulaire
+                const formData = new FormData(document.getElementById('testPostForm'));
+                const subject = formData.get('subject');
+                const audience = formData.get('audience');
+                const tone = formData.get('tone');
+                const language = formData.get('postLanguage');
+                const model = formData.get('ollamaModel');
+                
+                // Validation
+                if (!subject || !audience || !tone || !language || !model) {
+                    this.log('❌ Champs manquants pour la génération', 'error');
+                    this.showTestResult('❌ Veuillez remplir tous les champs obligatoires.', 'error');
+                    return;
+                }
+                
+                this.log(`📝 Génération avec: Sujet="${subject}", Audience="${audience}", Ton="${tone}", Langue="${language}", Modèle="${model}"`);
+                
+                // Simuler la génération
+                this.setLoadingState(true);
+                
+                try {
+                    // Simulation d'une génération
+                    await this.simulateGeneration(subject, audience, tone, language, model);
+                } catch (error) {
+                    this.log(`❌ Erreur lors de la génération: ${error.message}`, 'error');
+                    this.showTestResult(`❌ Erreur: ${error.message}`, 'error');
+                } finally {
+                    this.setLoadingState(false);
+                }
+            }
+            
+            async simulateGeneration(subject, audience, tone, language, model) {
+                this.log('🤖 Simulation de génération avec IA...');
+                
+                // Simuler un délai de génération
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Générer un post de test
+                const testPost = this.generateTestPost(subject, audience, tone, language);
+                
+                this.log('✅ Post généré avec succès', 'success');
+                this.displayTestPost(testPost);
+                this.showTestResult('✅ Post généré avec succès !', 'success');
+            }
+            
+            generateTestPost(subject, audience, tone, language) {
+                const isFrench = language === 'fr';
+                
+                const templates = {
+                    fr: {
+                        professional: `💼 Réflexion professionnelle sur ${subject}
+
+En tant que professionnel expérimenté, je constate que ${subject} représente un défi majeur pour notre secteur.
+
+🔍 Points clés à retenir :
+• Analyse approfondie de la situation
+• Solutions concrètes et applicables
+• Vision à long terme
+
+💡 Cette expérience renforce ma conviction que l'adaptabilité et l'innovation sont essentielles.
+
+#${subject.replace(/\s+/g, '')} #Professionnel #Innovation #LinkedIn`,
+                        
+                        inspirational: `✨ Inspiration du jour : ${subject}
+
+Parfois, les plus grandes opportunités naissent des défis les plus difficiles. ${subject} m'a appris que...
+
+🌟 Ce que j'ai découvert :
+• La force de la persévérance
+• L'importance de la collaboration
+• Le pouvoir de la créativité
+
+🚀 N'ayez jamais peur de repousser vos limites !
+
+#${subject.replace(/\s+/g, '')} #Inspiration #Motivation #LinkedIn`,
+                        
+                        casual: `Hey LinkedIn ! 👋
+
+Aujourd'hui, je voulais partager mes pensées sur ${subject}. C'est un sujet qui me tient à cœur et qui, je pense, mérite qu'on en parle.
+
+💭 Mon avis personnel :
+• C'est plus complexe qu'il n'y paraît
+• Il y a des solutions intéressantes
+• Ça vaut le coup de s'y intéresser
+
+Qu'en pensez-vous ? 🤔
+
+#${subject.replace(/\s+/g, '')} #Discussion #LinkedIn #Networking`
+                    },
+                    en: {
+                        professional: `💼 Professional insight on ${subject}
+
+As an experienced professional, I observe that ${subject} represents a major challenge for our industry.
+
+🔍 Key takeaways:
+• In-depth analysis of the situation
+• Concrete and applicable solutions
+• Long-term vision
+
+💡 This experience reinforces my belief that adaptability and innovation are essential.
+
+#${subject.replace(/\s+/g, '')} #Professional #Innovation #LinkedIn`,
+                        
+                        inspirational: `✨ Today's inspiration: ${subject}
+
+Sometimes, the greatest opportunities arise from the most difficult challenges. ${subject} taught me that...
+
+🌟 What I discovered:
+• The strength of perseverance
+• The importance of collaboration
+• The power of creativity
+
+🚀 Never be afraid to push your limits!
+
+#${subject.replace(/\s+/g, '')} #Inspiration #Motivation #LinkedIn`,
+                        
+                        casual: `Hey LinkedIn! 👋
+
+Today, I wanted to share my thoughts on ${subject}. It's a topic that's close to my heart and I think it's worth discussing.
+
+💭 My personal take:
+• It's more complex than it seems
+• There are interesting solutions
+• It's worth getting interested in
+
+What do you think? 🤔
+
+#${subject.replace(/\s+/g, '')} #Discussion #LinkedIn #Networking`
+                    }
+                };
+                
+                const toneKey = tone in templates[language] ? tone : 'professional';
+                return templates[language][toneKey];
+            }
+            
+            displayTestPost(content) {
+                const postResult = document.getElementById('testPostResult');
+                const postContent = document.getElementById('testPostContent');
+                
+                if (postResult && postContent) {
+                    postContent.textContent = content;
+                    postResult.style.display = 'block';
+                    
+                    // Scroll vers le résultat
+                    postResult.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    
+                    this.log('✅ Post affiché avec succès');
+                }
+            }
+            
+            setLoadingState(isLoading) {
+                const btn = document.getElementById('testGenerateBtn');
+                if (!btn) return;
+                
+                if (isLoading) {
+                    this.originalBtnText = btn.innerHTML;
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="loading"></span> Génération...';
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = this.originalBtnText;
+                }
+            }
+            
+            showTestResult(message, type) {
+                const resultsDiv = document.getElementById('test-results');
+                if (resultsDiv) {
+                    resultsDiv.innerHTML = `<div class="result ${type}">${message}</div>`;
+                    
+                    // Effacer le message après 5 secondes
+                    setTimeout(() => {
+                        resultsDiv.innerHTML = '';
+                    }, 5000);
+                }
+            }
+            
+            displayDiagnosticResults(results) {
+                const diagnosticDiv = document.getElementById('diagnostic-results');
+                if (diagnosticDiv) {
+                    diagnosticDiv.innerHTML = `<div class="result info">${results.join('\n')}</div>`;
+                }
+            }
+        }
+        
+        // Fonctions globales pour les boutons
+        function diagnoseForm() {
+            if (tester) tester.diagnoseForm();
+        }
+        
+        function testValidation() {
+            if (tester) tester.testValidation();
+        }
+        
+        function testSubmission() {
+            if (tester) tester.testSubmission();
+        }
+        
+        function testCopyPost() {
+            const content = document.getElementById('testPostContent')?.textContent;
+            if (content) {
+                navigator.clipboard.writeText(content).then(() => {
+                    alert('Post copié dans le presse-papiers !');
+                }).catch(() => {
+                    alert('Erreur lors de la copie. Contenu :\n\n' + content);
+                });
+            }
+        }
+        
+        function testSavePost() {
+            alert('Fonction de sauvegarde testée avec succès !');
+        }
+        
+        function testPublishPost() {
+            alert('Fonction de publication testée avec succès !');
+        }
+        
+        // Initialisation du testeur
+        let tester;
+        document.addEventListener('DOMContentLoaded', () => {
+            tester = new PostGenerationTester();
+        });
+        
+        // Test automatique au chargement
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                if (tester) {
+                    tester.diagnoseForm();
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

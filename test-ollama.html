@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Ollama API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        .model-list {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .model-item {
+            padding: 8px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test de l'API Ollama</h1>
+        <p>Ce test vérifie la connectivité avec votre serveur Ollama à <code>http://82.29.172.185:11434</code></p>
+        
+        <div id="status" class="status info">En attente de test...</div>
+        
+        <button onclick="testConnection()">🔌 Tester la connexion</button>
+        <button onclick="loadModels()">📋 Charger les modèles</button>
+        <button onclick="testGeneration()">🚀 Tester la génération</button>
+        
+        <div id="models" class="model-list" style="display: none;">
+            <h3>Modèles disponibles :</h3>
+            <div id="modelList"></div>
+        </div>
+        
+        <div id="generation" style="display: none;">
+            <h3>Test de génération :</h3>
+            <textarea id="prompt" placeholder="Entrez votre prompt de test...">Tu es un expert en contenu LinkedIn. Rédige un post court et engageant sur l'innovation technologique.</textarea>
+            <button onclick="generateContent()">Générer du contenu</button>
+            <div id="result"></div>
+        </div>
+    </div>
+
+    <script>
+        const OLLAMA_URL = 'http://82.29.172.185:11434';
+        
+        function updateStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+        
+        async function testConnection() {
+            updateStatus('🔍 Test de connexion en cours...', 'info');
+            
+            try {
+                const response = await fetch(`${OLLAMA_URL}/api/tags`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    updateStatus('✅ Connexion réussie ! Serveur Ollama accessible.', 'success');
+                    document.getElementById('models').style.display = 'block';
+                    document.getElementById('generation').style.display = 'block';
+                } else {
+                    updateStatus(`❌ Erreur HTTP: ${response.status}`, 'error');
+                }
+                
+            } catch (error) {
+                updateStatus(`❌ Erreur de connexion: ${error.message}`, 'error');
+            }
+        }
+        
+        async function loadModels() {
+            updateStatus('📋 Chargement des modèles...', 'info');
+            
+            try {
+                const response = await fetch(`${OLLAMA_URL}/api/tags`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const models = data.models || [];
+                    
+                    if (models.length > 0) {
+                        updateStatus(`✅ ${models.length} modèle(s) chargé(s) avec succès !`, 'success');
+                        displayModels(models);
+                    } else {
+                        updateStatus('⚠️ Aucun modèle trouvé sur le serveur.', 'info');
+                    }
+                } else {
+                    updateStatus(`❌ Erreur lors du chargement des modèles: ${response.status}`, 'error');
+                }
+                
+            } catch (error) {
+                updateStatus(`❌ Erreur lors du chargement des modèles: ${error.message}`, 'error');
+            }
+        }
+        
+        function displayModels(models) {
+            const modelList = document.getElementById('modelList');
+            modelList.innerHTML = '';
+            
+            models.forEach(model => {
+                const modelItem = document.createElement('div');
+                modelItem.className = 'model-item';
+                modelItem.innerHTML = `
+                    <strong>${model.name}</strong><br>
+                    <small>Taille: ${formatBytes(model.size)} | Modifié: ${new Date(model.modified_at).toLocaleString()}</small>
+                `;
+                modelList.appendChild(modelItem);
+            });
+        }
+        
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        async function testGeneration() {
+            updateStatus('🚀 Test de génération...', 'info');
+            
+            try {
+                // Utiliser le premier modèle disponible
+                const response = await fetch(`${OLLAMA_URL}/api/tags`);
+                if (!response.ok) throw new Error('Impossible de récupérer les modèles');
+                
+                const data = await response.json();
+                const models = data.models || [];
+                
+                if (models.length === 0) {
+                    updateStatus('❌ Aucun modèle disponible pour le test', 'error');
+                    return;
+                }
+                
+                const firstModel = models[0].name;
+                updateStatus(`🧪 Test avec le modèle: ${firstModel}`, 'info');
+                
+            } catch (error) {
+                updateStatus(`❌ Erreur lors du test de génération: ${error.message}`, 'error');
+            }
+        }
+        
+        async function generateContent() {
+            const prompt = document.getElementById('prompt').value;
+            if (!prompt.trim()) {
+                updateStatus('❌ Veuillez entrer un prompt', 'error');
+                return;
+            }
+            
+            updateStatus('🚀 Génération en cours...', 'info');
+            
+            try {
+                // Récupérer le premier modèle disponible
+                const modelsResponse = await fetch(`${OLLAMA_URL}/api/tags`);
+                if (!modelsResponse.ok) throw new Error('Impossible de récupérer les modèles');
+                
+                const modelsData = await modelsResponse.json();
+                const models = modelsData.models || [];
+                
+                if (models.length === 0) {
+                    updateStatus('❌ Aucun modèle disponible', 'error');
+                    return;
+                }
+                
+                const model = models[0].name;
+                
+                // Générer le contenu
+                const generateResponse = await fetch(`${OLLAMA_URL}/api/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: model,
+                        messages: [{ role: 'user', content: prompt }],
+                        stream: false
+                    })
+                });
+                
+                if (!generateResponse.ok) {
+                    throw new Error(`Erreur génération: ${generateResponse.status}`);
+                }
+                
+                const result = await generateResponse.json();
+                const content = result.message?.content || result.response || 'Aucun contenu généré';
+                
+                document.getElementById('result').innerHTML = `
+                    <h4>Résultat généré :</h4>
+                    <textarea readonly style="height: 200px;">${content}</textarea>
+                `;
+                
+                updateStatus(`✅ Contenu généré avec succès avec le modèle ${model} !`, 'success');
+                
+            } catch (error) {
+                updateStatus(`❌ Erreur lors de la génération: ${error.message}`, 'error');
+                document.getElementById('result').innerHTML = `<p style="color: red;">Erreur: ${error.message}</p>`;
+            }
+        }
+        
+        // Test automatique au chargement
+        window.addEventListener('load', () => {
+            setTimeout(testConnection, 1000);
+        });
+    </script>
+</body>
+</html>

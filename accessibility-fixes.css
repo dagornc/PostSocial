@@ -1,0 +1,433 @@
+/* 🔧 Corrections d'Accessibilité - Champs de Saisie LinkedINPost */
+
+/* ===== CORRECTIONS CRITIQUES POUR L'ACCESSIBILITÉ ===== */
+
+/* Assurer que tous les champs de saisie sont interactifs */
+.form-group input,
+.form-group select,
+.form-group textarea {
+    /* Propriétés d'interaction essentielles */
+    pointer-events: auto !important;
+    user-select: text !important;
+    cursor: text !important;
+    
+    /* Z-index pour éviter les conflits */
+    position: relative;
+    z-index: 1;
+    
+    /* États de base */
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
+    
+    /* Accessibilité tactile */
+    -webkit-tap-highlight-color: rgba(0, 119, 181, 0.2);
+    touch-action: manipulation;
+    
+    /* Focus visible */
+    outline: none;
+    
+    /* CORRECTION CRITIQUE : Couleurs de texte et de fond */
+    background-color: #ffffff !important;
+    color: #2c3e50 !important;
+    border: 2px solid #e1e8ed !important;
+    
+    /* Amélioration de la lisibilité */
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+    padding: 12px 16px !important;
+    
+    /* Placeholder visible */
+    &::placeholder {
+        color: #95a5a6 !important;
+        opacity: 1 !important;
+        font-style: italic !important;
+    }
+    
+    /* Correction spécifique pour les placeholders */
+    &::-webkit-input-placeholder {
+        color: #95a5a6 !important;
+        opacity: 1 !important;
+    }
+    
+    &::-moz-placeholder {
+        color: #95a5a6 !important;
+        opacity: 1 !important;
+    }
+    
+    &:-ms-input-placeholder {
+        color: #95a5a6 !important;
+        opacity: 1 !important;
+    }
+}
+
+/* Corrections spécifiques pour les textarea */
+.form-group textarea {
+    cursor: text !important;
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.6;
+    font-family: inherit;
+}
+
+/* Corrections spécifiques pour les select */
+.form-group select {
+    cursor: pointer !important;
+    -webkit-appearance: auto;
+    -moz-appearance: auto;
+    appearance: auto;
+    
+    /* Icône de flèche personnalisée */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 16px;
+    padding-right: 40px;
+    
+    /* Amélioration de la lisibilité des options */
+    color: #2c3e50 !important;
+    background-color: #ffffff !important;
+}
+
+/* Amélioration des options dans les select */
+.form-group select option {
+    background-color: #ffffff !important;
+    color: #2c3e50 !important;
+    padding: 8px 12px !important;
+}
+
+.form-group select option:hover {
+    background-color: #f8f9fa !important;
+    color: #0077b5 !important;
+}
+
+.form-group select option:checked {
+    background-color: #0077b5 !important;
+    color: #ffffff !important;
+}
+
+/* Corrections spécifiques pour les input */
+.form-group input {
+    cursor: text !important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* ===== ÉTATS DE FOCUS AMÉLIORÉS ===== */
+
+/* Focus visible pour tous les champs */
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: 3px solid #0077b5 !important;
+    outline-offset: 2px !important;
+    border-color: #0077b5 !important;
+    box-shadow: 0 0 0 4px rgba(0, 119, 181, 0.1) !important;
+    
+    /* Animation de focus */
+    transform: translateY(-1px);
+    transition: all 0.2s ease;
+}
+
+/* Focus pour les navigateurs qui ne supportent pas :focus-visible */
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: 3px solid #0077b5 !important;
+    outline-offset: 2px !important;
+}
+
+/* ===== ÉTATS DE SURVOL ===== */
+
+/* Hover pour tous les champs */
+.form-group input:hover,
+.form-group select:hover,
+.form-group textarea:hover {
+    border-color: #00a0dc !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 119, 181, 0.15) !important;
+}
+
+/* ===== ÉTATS DE VALIDATION ===== */
+
+/* Champs valides */
+.form-group input:valid,
+.form-group select:valid,
+.form-group textarea:valid {
+    border-color: #27ae60 !important;
+    background-color: #f8fff9 !important;
+    color: #2c3e50 !important;
+}
+
+/* Champs invalides */
+.form-group input:invalid:not(:placeholder-shown),
+.form-group select:invalid:not(:placeholder-shown),
+.form-group textarea:invalid:not(:placeholder-shown) {
+    border-color: #e74c3c !important;
+    background-color: #fff8f8 !important;
+    color: #2c3e50 !important;
+}
+
+/* ===== CORRECTIONS POUR LES LABELS ===== */
+
+/* Labels associés aux champs */
+.form-group label {
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    user-select: none;
+    
+    /* Amélioration de la lisibilité */
+    font-weight: 600;
+    color: #2c3e50 !important;
+    margin-bottom: 8px;
+    display: block;
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+}
+
+/* Labels pour les champs requis */
+.form-group label .required {
+    color: #e74c3c !important;
+    font-weight: bold;
+    margin-left: 4px;
+}
+
+/* ===== CORRECTIONS POUR LES MESSAGES D'AIDE ===== */
+
+/* Messages d'aide contextuels */
+.field-help {
+    pointer-events: auto !important;
+    user-select: text !important;
+    cursor: help !important;
+    
+    /* Amélioration de la visibilité */
+    background-color: #f8f9fa !important;
+    border-left: 3px solid #0077b5 !important;
+    padding: 8px 12px !important;
+    margin-top: 6px !important;
+    border-radius: 6px !important;
+    font-size: 13px !important;
+    color: #495057 !important;
+    line-height: 1.4 !important;
+    
+    /* Animation d'apparition */
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+    transition: all 0.3s ease !important;
+    
+    /* Amélioration du contraste */
+    font-weight: 500 !important;
+}
+
+/* ===== CORRECTIONS POUR LES ÉTATS DÉSACTIVÉS ===== */
+
+/* Champs désactivés */
+.form-group input:disabled,
+.form-group select:disabled,
+.form-group textarea:disabled {
+    background-color: #f8f9fa !important;
+    color: #6c757d !important;
+    cursor: not-allowed !important;
+    opacity: 0.6 !important;
+    
+    /* Bordure distinctive */
+    border-color: #dee2e6 !important;
+    border-style: dashed !important;
+}
+
+/* Labels pour les champs désactivés */
+.form-group input:disabled + label,
+.form-group select:disabled + label,
+.form-group textarea:disabled + label {
+    color: #6c757d !important;
+    cursor: not-allowed !important;
+}
+
+/* ===== CORRECTIONS POUR LA NAVIGATION CLAVIER ===== */
+
+/* Focus visible pour la navigation clavier */
+.form-group input:focus-visible,
+.form-group select:focus-visible,
+.form-group textarea:focus-visible {
+    outline: 3px solid #0077b5 !important;
+    outline-offset: 2px !important;
+}
+
+/* ===== CORRECTIONS POUR LES ÉCRANS TACTILES ===== */
+
+/* Amélioration de l'expérience tactile */
+@media (hover: none) and (pointer: coarse) {
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        /* Taille minimale pour les écrans tactiles */
+        min-height: 44px !important;
+        font-size: 16px !important; /* Évite le zoom sur iOS */
+        
+        /* Espacement amélioré */
+        padding: 12px 16px !important;
+    }
+    
+    .form-group textarea {
+        min-height: 120px !important;
+    }
+}
+
+/* ===== CORRECTIONS POUR LES NAVIGATEURS ANCIENS ===== */
+
+/* Support pour les navigateurs qui ne supportent pas les propriétés modernes */
+@supports not (outline-offset: 2px) {
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: 3px solid #0077b5 !important;
+        margin: 2px !important;
+    }
+}
+
+/* ===== CORRECTIONS POUR LE MODE SOMBRE ===== */
+
+@media (prefers-color-scheme: dark) {
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        background-color: #2d2d2d !important;
+        color: #ffffff !important;
+        border-color: #404040 !important;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline-color: #4da6ff !important;
+        border-color: #4da6ff !important;
+        background-color: #3a3a3a !important;
+    }
+    
+    .form-group label {
+        color: #ffffff !important;
+    }
+    
+    .field-help {
+        background-color: #404040 !important;
+        color: #cccccc !important;
+        border-left-color: #4da6ff !important;
+    }
+    
+    /* Placeholder en mode sombre */
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+        color: #999999 !important;
+    }
+    
+    /* États de validation en mode sombre */
+    .form-group input:valid,
+    .form-group select:valid,
+    .form-group textarea:valid {
+        background-color: #1a3a1a !important;
+        border-color: #27ae60 !important;
+        color: #ffffff !important;
+    }
+    
+    .form-group input:invalid:not(:placeholder-shown),
+    .form-group select:invalid:not(:placeholder-shown),
+    .form-group textarea:invalid:not(:placeholder-shown) {
+        background-color: #3a1a1a !important;
+        border-color: #e74c3c !important;
+        color: #ffffff !important;
+    }
+    
+    /* Options des select en mode sombre */
+    .form-group select option {
+        background-color: #2d2d2d !important;
+        color: #ffffff !important;
+    }
+    
+    .form-group select option:hover {
+        background-color: #404040 !important;
+        color: #4da6ff !important;
+    }
+    
+    .form-group select option:checked {
+        background-color: #4da6ff !important;
+        color: #ffffff !important;
+    }
+}
+
+/* ===== CORRECTIONS POUR L'ACCESSIBILITÉ DES COULEURS ===== */
+
+/* Amélioration du contraste pour les états de validation */
+.form-group input:valid,
+.form-group select:valid,
+.form-group textarea:valid {
+    border-color: #1e7e34 !important; /* Vert plus foncé pour un meilleur contraste */
+}
+
+.form-group input:invalid:not(:placeholder-shown),
+.form-group select:invalid:not(:placeholder-shown),
+.form-group textarea:invalid:not(:placeholder-shown) {
+    border-color: #c82333 !important; /* Rouge plus foncé pour un meilleur contraste */
+}
+
+/* ===== CORRECTIONS POUR LES ANIMATIONS ===== */
+
+/* Réduction des animations pour les utilisateurs sensibles */
+@media (prefers-reduced-motion: reduce) {
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        transition: none !important;
+        animation: none !important;
+        transform: none !important;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        transform: none !important;
+    }
+}
+
+/* ===== CORRECTIONS SPÉCIFIQUES POUR LES CONFLITS CSS ===== */
+
+/* Surcharge des styles qui pourraient empêcher l'interaction */
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="search"],
+.form-group input[type="tel"],
+.form-group input[type="url"] {
+    pointer-events: auto !important;
+    user-select: text !important;
+    cursor: text !important;
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+}
+
+/* Correction pour les champs avec des attributs spécifiques */
+.form-group input[required],
+.form-group select[required],
+.form-group textarea[required] {
+    border-left: 3px solid #0077b5 !important;
+}
+
+/* ===== CORRECTIONS FINALES ===== */
+
+/* Assurer que tous les champs sont visibles et interactifs */
+.form-group * {
+    box-sizing: border-box !important;
+}
+
+/* Correction pour les champs dans des conteneurs avec overflow */
+.form-group {
+    overflow: visible !important;
+    position: relative !important;
+}
+
+/* Correction pour les champs dans des grilles */
+.form-row .form-group {
+    position: relative !important;
+    z-index: 1 !important;
+}

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Sauvegarde Profil LinkedIn</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .form-group { margin: 15px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Sauvegarde Profil LinkedIn</h1>
+    
+    <div class="test-section">
+        <h2>1. Test de Sauvegarde</h2>
+        <form id="profileForm">
+            <div class="form-group">
+                <label for="email">Email LinkedIn:</label>
+                <input type="email" id="email" name="email" placeholder="test@example.com" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Mot de passe LinkedIn:</label>
+                <input type="password" id="password" name="password" placeholder="Mot de passe" required>
+            </div>
+            <div class="form-group">
+                <label for="profileUrl">URL du profil (optionnel):</label>
+                <input type="url" id="profileUrl" name="profileUrl" placeholder="https://www.linkedin.com/in/username">
+            </div>
+            <button type="submit">💾 Sauvegarder le profil</button>
+        </form>
+        <div id="saveResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Test de Chargement</h2>
+        <button onclick="loadProfile()">📥 Charger le profil sauvegardé</button>
+        <div id="loadResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Test de Validation</h2>
+        <button onclick="validateProfile()">✅ Valider le profil</button>
+        <div id="validateResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Test de Suppression</h2>
+        <button onclick="clearProfile()">🗑️ Supprimer le profil</button>
+        <div id="clearResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>5. Test de Persistance</h2>
+        <button onclick="testPersistence()">🔄 Tester la persistance</button>
+        <div id="persistenceResult"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>6. Logs de Test</h2>
+        <div id="testLogs" style="background: #f8f9fa; padding: 10px; border-radius: 4px; font-family: monospace; max-height: 300px; overflow-y: auto;"></div>
+    </div>
+
+    <script>
+        // Fonction utilitaire pour logger les tests
+        function logTest(message, type = 'info') {
+            const logs = document.getElementById('testLogs');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.style.color = type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#17a2b8';
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logs.appendChild(logEntry);
+            logs.scrollTop = logs.scrollHeight;
+            console.log(`[TEST] ${message}`);
+        }
+        
+        // Fonction utilitaire pour afficher les résultats
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="test-result ${type}">${message}</div>`;
+        }
+        
+        // Test de sauvegarde
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const profileUrl = document.getElementById('profileUrl').value.trim();
+            
+            logTest('Tentative de sauvegarde du profil...');
+            
+            // Validation des champs
+            if (!email) {
+                showResult('saveResult', '❌ Email requis', 'error');
+                logTest('Échec: Email manquant', 'error');
+                return;
+            }
+            
+            if (!password) {
+                showResult('saveResult', '❌ Mot de passe requis', 'error');
+                logTest('Échec: Mot de passe manquant', 'error');
+                return;
+            }
+            
+            // Validation de l'email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showResult('saveResult', '❌ Format d\'email invalide', 'error');
+                logTest('Échec: Format d\'email invalide', 'error');
+                return;
+            }
+            
+            // Validation de l'URL si fournie
+            if (profileUrl && !isValidUrl(profileUrl)) {
+                showResult('saveResult', '❌ URL LinkedIn invalide', 'error');
+                logTest('Échec: URL LinkedIn invalide', 'error');
+                return;
+            }
+            
+            try {
+                // Sauvegarder dans le localStorage
+                const profile = {
+                    email,
+                    password,
+                    profileUrl: profileUrl || '',
+                    savedAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+                
+                localStorage.setItem('linkedinProfile', JSON.stringify(profile));
+                
+                showResult('saveResult', '✅ Profil sauvegardé avec succès !', 'success');
+                logTest('Profil sauvegardé avec succès', 'success');
+                logTest(`Email: ${email}`);
+                logTest(`URL: ${profileUrl || 'Non fournie'}`);
+                logTest(`Sauvegardé le: ${new Date(profile.savedAt).toLocaleString()}`);
+                
+            } catch (error) {
+                showResult('saveResult', `❌ Erreur lors de la sauvegarde: ${error.message}`, 'error');
+                logTest(`Erreur de sauvegarde: ${error.message}`, 'error');
+            }
+        });
+        
+        // Test de chargement
+        function loadProfile() {
+            logTest('Tentative de chargement du profil...');
+            
+            try {
+                const savedProfile = localStorage.getItem('linkedinProfile');
+                
+                if (!savedProfile) {
+                    showResult('loadResult', 'ℹ️ Aucun profil sauvegardé trouvé', 'info');
+                    logTest('Aucun profil trouvé', 'info');
+                    return;
+                }
+                
+                const profile = JSON.parse(savedProfile);
+                
+                if (profile.email && profile.password) {
+                    showResult('loadResult', `
+                        ✅ Profil chargé avec succès !<br>
+                        📧 Email: ${profile.email}<br>
+                        🔗 URL: ${profile.profileUrl || 'Non fournie'}<br>
+                        💾 Sauvegardé le: ${new Date(profile.savedAt).toLocaleString()}<br>
+                        🔄 Mis à jour le: ${new Date(profile.updatedAt).toLocaleString()}
+                    `, 'success');
+                    
+                    logTest('Profil chargé avec succès', 'success');
+                    logTest(`Email: ${profile.email}`);
+                    logTest(`URL: ${profile.profileUrl || 'Non fournie'}`);
+                    logTest(`Sauvegardé le: ${new Date(profile.savedAt).toLocaleString()}`);
+                } else {
+                    showResult('loadResult', '❌ Profil corrompu ou incomplet', 'error');
+                    logTest('Profil corrompu ou incomplet', 'error');
+                }
+                
+            } catch (error) {
+                showResult('loadResult', `❌ Erreur lors du chargement: ${error.message}`, 'error');
+                logTest(`Erreur de chargement: ${error.message}`, 'error');
+            }
+        }
+        
+        // Test de validation
+        function validateProfile() {
+            logTest('Validation du profil...');
+            
+            try {
+                const savedProfile = localStorage.getItem('linkedinProfile');
+                
+                if (!savedProfile) {
+                    showResult('validateResult', 'ℹ️ Aucun profil à valider', 'info');
+                    logTest('Aucun profil à valider', 'info');
+                    return;
+                }
+                
+                const profile = JSON.parse(savedProfile);
+                
+                const validations = [];
+                
+                // Validation de l'email
+                if (profile.email && profile.email.trim() !== '') {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (emailRegex.test(profile.email)) {
+                        validations.push('✅ Email valide');
+                        logTest('Email valide');
+                    } else {
+                        validations.push('❌ Email invalide');
+                        logTest('Email invalide', 'error');
+                    }
+                } else {
+                    validations.push('❌ Email manquant');
+                    logTest('Email manquant', 'error');
+                }
+                
+                // Validation du mot de passe
+                if (profile.password && profile.password.trim() !== '') {
+                    validations.push('✅ Mot de passe présent');
+                    logTest('Mot de passe présent');
+                } else {
+                    validations.push('❌ Mot de passe manquant');
+                    logTest('Mot de passe manquant', 'error');
+                }
+                
+                // Validation de l'URL
+                if (profile.profileUrl) {
+                    if (isValidUrl(profile.profileUrl)) {
+                        validations.push('✅ URL LinkedIn valide');
+                        logTest('URL LinkedIn valide');
+                    } else {
+                        validations.push('❌ URL LinkedIn invalide');
+                        logTest('URL LinkedIn invalide', 'error');
+                    }
+                } else {
+                    validations.push('ℹ️ URL non fournie (optionnel)');
+                    logTest('URL non fournie (optionnel)');
+                }
+                
+                // Validation des timestamps
+                if (profile.savedAt && profile.updatedAt) {
+                    validations.push('✅ Timestamps présents');
+                    logTest('Timestamps présents');
+                } else {
+                    validations.push('❌ Timestamps manquants');
+                    logTest('Timestamps manquants', 'error');
+                }
+                
+                showResult('validateResult', validations.join('<br>'), 'info');
+                
+            } catch (error) {
+                showResult('validateResult', `❌ Erreur lors de la validation: ${error.message}`, 'error');
+                logTest(`Erreur de validation: ${error.message}`, 'error');
+            }
+        }
+        
+        // Test de suppression
+        function clearProfile() {
+            logTest('Suppression du profil...');
+            
+            try {
+                localStorage.removeItem('linkedinProfile');
+                showResult('clearResult', '✅ Profil supprimé avec succès', 'success');
+                logTest('Profil supprimé avec succès', 'success');
+            } catch (error) {
+                showResult('clearResult', `❌ Erreur lors de la suppression: ${error.message}`, 'error');
+                logTest(`Erreur de suppression: ${error.message}`, 'error');
+            }
+        }
+        
+        // Test de persistance
+        function testPersistence() {
+            logTest('Test de persistance...');
+            
+            try {
+                // Créer un profil de test
+                const testProfile = {
+                    email: 'test@example.com',
+                    password: 'testpassword123',
+                    profileUrl: 'https://www.linkedin.com/in/testuser',
+                    savedAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+                
+                // Sauvegarder
+                localStorage.setItem('linkedinProfile', JSON.stringify(testProfile));
+                logTest('Profil de test sauvegardé');
+                
+                // Vérifier la sauvegarde
+                const saved = localStorage.getItem('linkedinProfile');
+                if (saved) {
+                    const loaded = JSON.parse(saved);
+                    if (loaded.email === testProfile.email) {
+                        showResult('persistenceResult', '✅ Test de persistance réussi !', 'success');
+                        logTest('Test de persistance réussi', 'success');
+                    } else {
+                        showResult('persistenceResult', '❌ Test de persistance échoué', 'error');
+                        logTest('Test de persistance échoué', 'error');
+                    }
+                } else {
+                    showResult('persistenceResult', '❌ Test de persistance échoué', 'error');
+                    logTest('Test de persistance échoué', 'error');
+                }
+                
+                // Nettoyer
+                localStorage.removeItem('linkedinProfile');
+                logTest('Profil de test supprimé');
+                
+            } catch (error) {
+                showResult('persistenceResult', `❌ Erreur lors du test: ${error.message}`, 'error');
+                logTest(`Erreur de test: ${error.message}`, 'error');
+            }
+        }
+        
+        // Fonction de validation d'URL
+        function isValidUrl(string) {
+            try {
+                const url = new URL(string);
+                return url.hostname.includes('linkedin.com');
+            } catch (_) {
+                return false;
+            }
+        }
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            logTest('Page de test chargée');
+            logTest('Tests disponibles:');
+            logTest('1. Sauvegarde de profil');
+            logTest('2. Chargement de profil');
+            logTest('3. Validation de profil');
+            logTest('4. Suppression de profil');
+            logTest('5. Test de persistance');
+        });
+    </script>
+</body>
+</html>
